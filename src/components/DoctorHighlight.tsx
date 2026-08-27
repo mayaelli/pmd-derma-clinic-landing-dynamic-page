@@ -165,7 +165,7 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
             className="lg:col-span-7 space-y-8"
           >
             {/* Badge & Title */}
-            <div className="space-y-3">
+            <div className="space-y-3 relative z-10 pt-4 md:pt-0">
               <motion.div variants={itemVariants} className="inline-block">
                 <div className="inline-flex items-center gap-2 bg-white border border-[#E5BCA9]/60 text-[#C87D87] px-3.5 py-1 rounded-full text-xs font-sans font-semibold shadow-xs">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#C87D87]" />
