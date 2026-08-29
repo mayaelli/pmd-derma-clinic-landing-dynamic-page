@@ -31,7 +31,7 @@ export const clinicConfig = {
   },
   stats: [
     { label: "Followers", value: "18K+" },
-    { label: "Reel Views", value: "2.1M+" },
+    { label: "Years of Expertise", value: "10+" },
     { label: "Board Certified", value: "PDS Member" },
   ],
   promos: [
