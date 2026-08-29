@@ -15,6 +15,14 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
+
 export default function RootLayout({
   children,
 }: {
