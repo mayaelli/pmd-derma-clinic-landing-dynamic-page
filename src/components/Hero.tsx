@@ -23,8 +23,8 @@ const itemVariants = {
 
 export function Hero({ onBookClick }: HeroProps) {
   return (
-    <div id="hero" className="bg-[#FAF7F2] border-b border-[#E5BCA9]/40 min-h-screen flex flex-col justify-center">
-      <section className="max-w-7xl mx-auto px-6 pt-24 md:pt-28 pb-10 md:pb-14 grid md:grid-cols-2 gap-12 items-center w-full">      
+      <div id="hero" className="bg-[#FAF7F2] border-b border-[#E5BCA9]/40 min-h-[calc(100vh-5rem)] flex flex-col justify-center overflow-hidden">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 lg:pt-12 lg:pb-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">      
         {/* Animated Text Column */}
         <motion.div
           initial="hidden"

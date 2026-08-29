@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { getServices } from "@/lib/getServices";
 import { getPromos, PromoCampaign } from "@/lib/getPromos";
-import { getFeedbacks } from "@/lib/getFeedbacks";
+import { getFeedbacks, FeedbackItem } from "@/lib/getFeedbacks";
 import { Services } from "@/components/Services";
 import { clinicConfig, ServicesConfig } from "@/config/clinicConfig";
 import { Promos } from "@/components/Promos";
@@ -18,11 +18,11 @@ import { Footer } from "@/components/Footer";
 const SCHEDULE_URLS = {
   DEFAULT: "https://calendar.app.google/Dx3kqgCveUnEREUd7",
 };
-const feedbacks = await getFeedbacks();
 
 export default function Home() {
   const [servicesData, setServicesData] = useState<ServicesConfig>(clinicConfig.services);
   const [promosData, setPromosData] = useState<PromoCampaign[]>([]);
+  const [feedbacksData, setFeedbacksData] = useState<FeedbackItem[]>([]);
   const [selectedScheduleUrl, setSelectedScheduleUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export default function Home() {
         ]);
         if (services) setServicesData(services);
         if (promos) setPromosData(promos);
+        if (feedbacks) setFeedbacksData(feedbacks);
       } catch (error) {
         console.error("Failed to load dynamic sheet data:", error);
       }
@@ -43,7 +44,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2]">
+    <main className="min-h-screen bg-[#FAF7F2] pt-20 overflow-x-hidden">
       {/* Header and Hero open the default appointment schedule */}
       <Header onBookClick={() => setSelectedScheduleUrl(SCHEDULE_URLS.DEFAULT)} />
       <Hero onBookClick={() => setSelectedScheduleUrl(SCHEDULE_URLS.DEFAULT)} />
@@ -57,7 +58,7 @@ export default function Home() {
       {/* Promos component now receives dynamic promo data */}
       <Promos promos={promosData} />
 
-      <Feedback initialFeedbacks={feedbacks}/>
+      <Feedback initialFeedbacks={feedbacksData} />
       <DoctorHighlight onBookClick={() => setSelectedScheduleUrl(SCHEDULE_URLS.DEFAULT)} />
       <Footer />
 
