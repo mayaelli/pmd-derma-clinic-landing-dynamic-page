@@ -47,7 +47,7 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --font-sans: var(--font-poppins), sans-serif;
-  --font-serif: var(--font-playfair), serif;
+  --font-serif: var(--font-dm-serif), serif;
 }
 
 :root {
@@ -119,6 +119,23 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ─── Precious MD Brand Palette ─────────────────────────────────────────── */
+:root {
+  /* Primary / Dominant CTA */
+  --brand-flush-pink: #E48EAB;
+  --brand-flush-pink-hover: #D4778E;
+  /* Secondary / Soft Accent */
+  --brand-dewy-rose: #F8BFC5;
+  /* Grounding / Professional Accent */
+  --brand-slate: #908A94;
+  --brand-slate-dark: #BABBBF;
+  /* Warm Accent — use sparingly (<10% visual weight) */
+  --brand-taupe: #CD9581;
+  /* Neutral Base */
+  --brand-white: #FFFFFF;
+  --brand-mist: #E3E4E8;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -130,8 +147,9 @@
     @apply border-border outline-ring/50;
     box-sizing: border-box;
   }
-  
-  html, body {
+
+  html,
+  body {
     max-width: 100vw;
     overflow-x: hidden;
   }
@@ -142,11 +160,11 @@
     margin: 0;
     padding: 0;
   }
-  
+
   html {
     @apply font-sans;
   }
-} 
+}
 
 /* Keeps scaled cutouts sharp and reduces blur */
 .rendering-crisp {

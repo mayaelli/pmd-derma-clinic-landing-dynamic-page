@@ -13,12 +13,10 @@ import {
   MapPin,
 } from "lucide-react";
 
-
 interface DoctorHighlightProps {
   onBookClick?: () => void;
 }
 
-// Animation Variants for Parent Container & Staggered Children
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -39,8 +37,6 @@ const itemVariants: Variants = {
   },
 };
 
-
-
 export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
   const credentials = [
     {
@@ -54,47 +50,45 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
       icon: ShieldCheck,
       title: "FPDS Board-Certified",
       desc: "Fellow of the Philippine Dermatological Society",
-      color: "text-[#6B7556]",
-      bg: "bg-[#6B7556]/10",
+      color: "text-[#908A94]",
+      bg: "bg-[#908A94]/10",
     },
     {
       icon: Award,
       title: "DPACS Diplomate",
       desc: "Philippine Academy of Cutaneous Surgery",
-      color: "text-[#C87D87]",
-      bg: "bg-[#C87D87]/10",
+      color: "text-[#E48EAB]",
+      bg: "bg-[#E48EAB]/10",
     },
     {
       icon: Globe2,
       title: "FEAFWH Fellow",
       desc: "European Assoc. of Fellows in Wound Healing (Madrid)",
-      color: "text-[#6B7556]",
-      bg: "bg-[#6B7556]/10",
+      color: "text-[#908A94]",
+      bg: "bg-[#908A94]/10",
     },
     {
       icon: Building2,
       title: "EAMC Residency",
       desc: "Dermatology Training at East Avenue Medical Center",
-      color: "text-[#C87D87]",
-      bg: "bg-[#C87D87]/10",
+      color: "text-[#E48EAB]",
+      bg: "bg-[#E48EAB]/10",
     },
     {
       icon: Sparkles,
       title: "Harvard Medical School",
       desc: "Leadership in Medicine SE Asia Program Alumna",
-      color: "text-[#6B7556]",
-      bg: "bg-[#6B7556]/10",
+      color: "text-[#CD9581]",
+      bg: "bg-[#CD9581]/10",
     },
   ];
-
-  
 
   return (
     <section
       id="about-doctor"
-      className="scroll-mt-20 bg-[#FAF7F2] py-10 border-b border-[#E5BCA9]/30 relative overflow-hidden"
+      className="scroll-mt-20 bg-[#FAF7F2] py-16 sm:py-20 border-b border-[#E5BCA9]/30 relative overflow-hidden"
     >
-      {/* Animated Ambient Background Glows */}
+      {/* Ambient Background Glows */}
       <motion.div
         animate={{
           scale: [1, 1.1, 1],
@@ -112,47 +106,60 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
         className="absolute bottom-0 left-0 w-80 h-80 bg-[#E5BCA9]/20 rounded-full blur-3xl pointer-events-none"
       />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
-          {/* Column 1: Doctor Portrait with Soft Entrance & Floating Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.9, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="lg:col-span-5 relative flex justify-center items-end self-end -mb-20 pt-8"
-          >
-            {/* Floating Location Tag with Subtle Idle Bobbing */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              animate={{ y: [0, -6, 0] }}
-              /* @ts-ignore - Combine framer motion loop with initial enter */
-              transition={{ y: { duration: 4, repeat: Infinity, ease: "easeInOut" } }}
-              className="absolute top-0 left-2 sm:left-6 z-20 bg-white/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-[#E5BCA9]/40 shadow-xs flex items-center gap-2"
-            >
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <div className="flex items-center gap-1 text-[11px] font-sans font-medium text-[#333D29]">
-                <MapPin className="w-3 h-3 text-[#C87D87]" />
-                <span>Iligan City • Lanao Region</span>
-              </div>
-            </motion.div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 
-            {/* Large Freestanding Cutout Image */}
-            <div className="relative w-full h-[580px] lg:h-[680px] flex justify-center items-end">
-              <Image
-                src="/precious-md-doctor.png"
-                alt="Dr. Precious Usman Imam, Board-Certified Dermatologist"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                quality={95}
-                unoptimized
-                className="object-contain object-bottom filter drop-shadow-xl transition-transform duration-700 hover:scale-[1.02] rendering-crisp"
-                priority
-              />
+          {/* Column 1: Aesthetic Framed Doctor Portrait */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 relative flex justify-center items-center"
+          >
+            {/* Outer Decorative Glowing Accent Ring */}
+            <div className="relative w-full max-w-[380px] sm:max-w-[420px]">
+              <div className="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-b from-[#E5BCA9]/60 via-[#F8BFC5]/20 to-[#E5BCA9]/40 opacity-70 blur-md pointer-events-none" />
+
+              {/* Sophisticated Image Frame Box */}
+              <div className="relative rounded-[2.25rem] overflow-hidden bg-white p-2.5 sm:p-3 border-2 border-white/90 shadow-2xl shadow-[#E48EAB]/10 backdrop-blur-md">
+                <div className="relative aspect-4/5 w-full rounded-[1.75rem] overflow-hidden bg-[#FAF7F2]">
+                  <Image
+                    src="/precious-md-new-doctor.png"
+                    alt="Dr. Precious Usman Imam, Board-Certified Dermatologist"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 420px"
+                    quality={95}
+                    unoptimized
+                    className="object-cover object-center transition-transform duration-700 hover:scale-[1.03]"
+                    priority
+                  />
+                </div>
+
+                {/* Repositioned Floating Location Badge Inside Frame */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                  animate={{ y: [0, -4, 0] }}
+                  /* @ts-ignore */
+                  transition={{ y: { duration: 4, repeat: Infinity, ease: "easeInOut" } }}
+                  className="absolute bottom-5 left-5 right-5 z-20 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-[#E5BCA9]/50 shadow-lg flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#E48EAB] animate-pulse" />
+                    <span className="text-xs font-sans font-semibold text-[#333D29]">
+                      Dr. Precious Usman Imam
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] font-sans font-medium text-[#C87D87]">
+                    <MapPin className="w-3.5 h-3.5 text-[#C87D87]" />
+                    <span>Iligan City</span>
+                  </div>
+                </motion.div>
+
+              </div>
             </div>
           </motion.div>
 
@@ -162,12 +169,12 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            className="lg:col-span-7 space-y-8"
+            className="lg:col-span-7 space-y-6 sm:space-y-8"
           >
             {/* Badge & Title */}
-            <div className="space-y-3 relative z-10 pt-4 md:pt-0">
+            <div className="space-y-3 relative z-10 pt-2 lg:pt-0 text-left">
               <motion.div variants={itemVariants} className="inline-block">
-                <div className="inline-flex items-center gap-2 bg-white border border-[#E5BCA9]/60 text-[#C87D87] px-3.5 py-1 rounded-full text-xs font-sans font-semibold shadow-xs">
+                <div className="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-900 px-3.5 py-1 rounded-lg text-xs font-sans font-semibold shadow-sm">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#C87D87]" />
                   <span>Medical Leadership</span>
                 </div>
@@ -175,7 +182,7 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
 
               <motion.h2
                 variants={itemVariants}
-                className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#333D29] tracking-tight leading-tight"
+                className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2D2B30] tracking-tight leading-tight"
               >
                 Dr. Precious Usman Imam
                 <span className="block text-sm sm:text-base font-sans font-normal text-[#C87D87] mt-1">
@@ -185,10 +192,10 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
 
               <motion.p
                 variants={itemVariants}
-                className="font-sans text-xs sm:text-sm text-[#525B44] leading-relaxed font-light"
+                className="font-sans text-sm text-slate-700 leading-relaxed"
               >
-                Dr. Precious Usman Imam is a board-certified dermatologist and the founder of the 
-                <strong className="font-semibold text-[#333D29]"> Precious MD Dermatology Center</strong> in Iligan City. She provides specialized medical, surgical, and aesthetic care to patients across Lanao del Norte and Lanao del Sur.
+                Dr. Precious Usman Imam is a board-certified dermatologist and the founder of the
+                <strong className="font-semibold text-slate-900"> Precious MD Dermatology Center</strong> in Iligan City. She provides specialized medical, surgical, and aesthetic care to patients across Lanao del Norte and Lanao del Sur.
               </motion.p>
             </div>
 
@@ -220,7 +227,7 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
                         <Icon className={`w-4 h-4 ${cred.color}`} />
                       </div>
                       <div className="space-y-0.5">
-                        <div className="font-serif text-xs font-bold text-[#333D29] group-hover:text-[#C87D87] transition-colors">
+                        <div className="font-serif text-xs font-bold text-[#2D2B30] group-hover:text-[#C87D87] transition-colors">
                           {cred.title}
                         </div>
                         <div className="font-sans text-[11px] text-[#525B44] font-light leading-snug">
@@ -240,9 +247,9 @@ export function DoctorHighlight({ onBookClick }: DoctorHighlightProps) {
                 onClick={onBookClick}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 bg-[#6B7556] hover:bg-[#586146] text-white font-sans text-xs font-semibold px-6 py-3 rounded-full shadow-xs hover:shadow-md transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#CD9581] hover:bg-[#B8846F] text-white font-sans text-xs font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
-                <Calendar className="w-4 h-4 text-[#FBEAD6]" />
+                <Calendar className="w-4 h-4 text-white/80" />
                 <span>Book Consultation with Dr. Precious</span>
               </motion.button>
             </motion.div>

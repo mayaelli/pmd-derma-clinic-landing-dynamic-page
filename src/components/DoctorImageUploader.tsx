@@ -70,7 +70,7 @@ export function DoctorImageUploader() {
           <span className="text-xs font-semibold text-[#333D29]">
             {loading ? "Processing Cutout..." : "Upload Dr. Precious Portrait"}
           </span>
-          <span className="text-[10px] text-[#6B7556] mt-1">PNG or JPG (High Quality Recommended)</span>
+          <span className="text-[10px] text-[#908A94] mt-1">PNG or JPG (High Quality Recommended)</span>
 
           <input
             type="file"
@@ -92,7 +92,7 @@ export function DoctorImageUploader() {
                 backgroundSize: "12px 12px",
               }}
             />
-            
+
             {/* Clean Transparent Cutout */}
             <img
               src={processedUrl}
@@ -105,9 +105,9 @@ export function DoctorImageUploader() {
             <a
               href={processedUrl}
               download="precious-md-doctor.png"
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-[#6B7556] hover:bg-[#586146] text-white text-xs font-semibold py-3 rounded-full shadow-xs hover:shadow-md transition-all active:scale-95"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-[#E48EAB] hover:bg-[#D4778E] text-white text-xs font-semibold py-3 rounded-full shadow-xs hover:shadow-md transition-all active:scale-95"
             >
-              <Download className="w-4 h-4 text-[#FBEAD6]" />
+              <Download className="w-4 h-4 text-white/80" />
               <span>Download High-Res Cutout PNG</span>
             </a>
 
@@ -131,7 +131,7 @@ export function DoctorImageUploader() {
           <div className="w-full bg-[#FAF7F2] h-2 rounded-full overflow-hidden border border-[#E5BCA9]/30">
             <div className="bg-[#C87D87] h-full w-2/3 animate-pulse rounded-full" />
           </div>
-          <p className="text-[11px] font-sans text-[#6B7556] font-medium">{progress}</p>
+          <p className="text-[11px] font-sans text-[#908A94] font-medium">{progress}</p>
         </div>
       )}
     </div>

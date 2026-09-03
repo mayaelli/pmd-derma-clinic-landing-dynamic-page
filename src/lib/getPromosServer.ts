@@ -1,27 +1,8 @@
-// src/lib/getPromos.ts
-import { createClient } from "@/lib/supabase/client";
+// src/lib/getPromosServer.ts
+// Server-side version — uses the server Supabase client so revalidatePath works.
+import { createClient } from "@/lib/supabase/server";
+import type { PromoCampaign, PromoItem } from "@/lib/getPromos";
 
-export interface PromoItem {
-  name: string;
-  sessions: string;
-  price: string;
-  originalPrice?: string;
-}
-
-export interface PromoCampaign {
-  id: string;
-  title: string;
-  subtitle?: string;
-  validity: string;
-  validUntil?: string;
-  pubmatImage: string;
-  badge: string;
-  items: PromoItem[];
-}
-
-// Parse the pipe-delimited items string stored in DB back into PromoItem[]
-// Format per item: "Name | sessions | price | originalPrice(optional)"
-// Items are separated by ";"
 function parseItems(raw: string | null): PromoItem[] {
   if (!raw || raw.trim() === "") return [];
 
@@ -41,8 +22,8 @@ function parseItems(raw: string | null): PromoItem[] {
     .filter((item) => item.name.length > 0);
 }
 
-export async function getPromos(): Promise<PromoCampaign[]> {
-  const supabase = createClient();
+export async function getPromosServer(): Promise<PromoCampaign[]> {
+  const supabase = await createClient();
 
   try {
     const { data, error } = await supabase
@@ -66,7 +47,7 @@ export async function getPromos(): Promise<PromoCampaign[]> {
       items: parseItems(row.items),
     }));
   } catch (err) {
-    console.error("Failed to fetch promos:", err);
+    console.error("Failed to fetch promos (server):", err);
     return [];
   }
 }

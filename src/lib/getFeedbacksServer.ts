@@ -1,18 +1,10 @@
-// src/lib/getFeedbacks.ts
-import { createClient } from "@/lib/supabase/client";
+// src/lib/getFeedbacksServer.ts
+// Server-side version of getFeedbacks — uses the server Supabase client.
+import { createClient } from "@/lib/supabase/server";
+import { FeedbackItem } from "@/lib/getFeedbacks";
 
-export interface FeedbackItem {
-  id: string;
-  name: string;
-  roleOrService: string;
-  comment: string;
-  rating: number;
-  avatarUrl?: string;
-  date?: string;
-}
-
-export async function getFeedbacks(): Promise<FeedbackItem[]> {
-  const supabase = createClient();
+export async function getFeedbacksServer(): Promise<FeedbackItem[]> {
+  const supabase = await createClient();
 
   try {
     const { data, error } = await supabase
@@ -39,8 +31,8 @@ export async function getFeedbacks(): Promise<FeedbackItem[]> {
         })
         : undefined,
     }));
-  } catch (error) {
-    console.error("Failed to fetch feedbacks:", error);
+  } catch (err) {
+    console.error("Failed to fetch feedbacks (server):", err);
     return [];
   }
 }
