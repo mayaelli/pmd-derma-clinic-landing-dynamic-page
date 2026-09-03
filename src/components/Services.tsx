@@ -438,7 +438,13 @@ export default function Services({ services, loading = false, onBookClick }: Ser
 
               {selectedService.image && (
                 <div className="relative aspect-[16/9] w-full rounded-t-3xl overflow-hidden bg-[#FFF0F2]">
-                  <Image src={selectedService.image} alt={selectedService.name} fill className="object-cover" />
+                  <Image
+                    src={selectedService.image}
+                    alt={selectedService.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 448px"
+                    className="object-cover"
+                  />
                 </div>
               )}
 
@@ -618,6 +624,7 @@ function ServiceCard({
             src={service.image}
             alt={service.name}
             fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </div>
