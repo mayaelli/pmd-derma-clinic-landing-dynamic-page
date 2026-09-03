@@ -121,8 +121,8 @@ export function Header({ onBookClick }: HeaderProps) {
                   href={item.href}
                   onClick={(e) => scrollToSection(e, item.href, item.name)}
                   className={`relative text-sm font-sans font-medium transition-colors duration-200 cursor-pointer ${isActive
-                      ? "text-[#CD9581]"
-                      : "text-slate-800 hover:text-[#CD9581]"
+                    ? "text-[#CD9581]"
+                    : "text-slate-800 hover:text-[#CD9581]"
                     }`}
                 >
                   {item.name}
@@ -153,8 +153,7 @@ export function Header({ onBookClick }: HeaderProps) {
               className="inline-flex items-center gap-2 bg-[#CD9581] hover:bg-[#B8846F] text-white font-sans text-sm font-semibold px-6 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer"
             >
               <Calendar className="w-4 h-4 text-white/90" />
-              <span className="hidden sm:inline">Book Slot</span>
-              <span className="sm:hidden">Book</span>
+              <span>Book Slot</span>
             </a>
 
             {/* Hamburger Icon */}
@@ -193,8 +192,8 @@ export function Header({ onBookClick }: HeaderProps) {
                     href={item.href}
                     onClick={(e) => scrollToSection(e, item.href, item.name)}
                     className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive
-                        ? "bg-[#CD9581]/10 text-[#CD9581] font-semibold"
-                        : "text-slate-800 hover:bg-slate-50 hover:text-[#CD9581]"
+                      ? "bg-[#CD9581]/10 text-[#CD9581] font-semibold"
+                      : "text-slate-800 hover:bg-slate-50 hover:text-[#CD9581]"
                       }`}
                   >
                     {item.name}

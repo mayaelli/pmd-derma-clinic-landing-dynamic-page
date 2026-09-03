@@ -205,7 +205,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left text-[11px] sm:text-xs font-light text-[#908A94]">
-          <div>
+          <div suppressHydrationWarning>
             &copy; {new Date().getFullYear()} Precious MD Dermatology Clinic.
           </div>
           <div className="flex items-center gap-1.5">

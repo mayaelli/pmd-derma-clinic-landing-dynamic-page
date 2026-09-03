@@ -23,7 +23,7 @@ export default function HomeClient({ servicesData, promosData, feedbacksData }: 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2] pt-20 overflow-x-hidden">
+    <main className="min-h-screen bg-white overflow-x-hidden">
       <Header onBookClick={() => setIsBookingOpen(true)} />
       <Hero onBookClick={() => setIsBookingOpen(true)} />
 

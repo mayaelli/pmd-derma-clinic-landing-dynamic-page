@@ -1,8 +1,36 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## ⚠️ Security Alert - Action Required
+
+**If you're setting up this project for the first time, please read `ACTION_REQUIRED.md` immediately.**
+
+A Google API key was previously exposed in the repository. You must:
+1. Rotate the API key at Google Cloud Console
+2. Set up your environment variables properly
+
+See `ACTION_REQUIRED.md` and `ROTATE_API_KEY.md` for detailed instructions.
+
 ## Getting Started
 
-First, run the development server:
+### 1. Set Up Environment Variables
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local` and fill in your actual values. **Never commit this file to Git.**
+
+See `SECURITY.md` for best practices and `ROTATE_API_KEY.md` for Google API key setup.
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the Development Server
 
 ```bash
 npm run dev

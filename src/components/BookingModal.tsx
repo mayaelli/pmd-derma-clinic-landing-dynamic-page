@@ -17,9 +17,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-// Google Calendar Config
-const GOOGLE_CALENDAR_ID = "slcpmaya@gmail.com";
-const API_KEY = "AIzaSyCsC6rg0coi9lPpflFHXaZOy_PPL6L7Kvg";
+// Google Calendar Config - MOVED TO ENVIRONMENT VARIABLES FOR SECURITY
+const GOOGLE_CALENDAR_ID = process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID || "";
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
 
 interface ProcedureBoardModalProps {
   isOpen: boolean;
