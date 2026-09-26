@@ -1,205 +1,193 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Menu, X, Sparkles } from "lucide-react";
+import { Calendar, Menu, X } from "lucide-react";
 
 interface HeaderProps {
   onBookClick?: () => void;
 }
 
 export function Header({ onBookClick }: HeaderProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [activeNav, setActiveNav] = useState("Home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "Home", href: "#hero" },
-    { name: "Services", href: "#services" },
-    { name: "Promos", href: "#promos" },
-    { name: "Feedbacks", href: "#feedback" },
-    { name: "Doctor", href: "#about-doctor" },
+    { name: "Home", href: "/", hash: "#hero" },
+    { name: "Services", href: "/services", hash: null },
+    { name: "Promos", href: "/#promos", hash: "#promos" },
+    { name: "Membership", href: "/membership", hash: null },
+    { name: "Reviews", href: "/#feedback", hash: "#feedback" },
+    { name: "Doctors", href: "/about", hash: null },
   ];
 
-  // 1. Detect scroll depth
+  // Smart Hide-on-Scroll
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 20);
+      if (currentScrollY < 80) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY);
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
-  // 2. Automatically update active link on scroll
+  // Sync active with route
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: "-20% 0px -60% 0px",
-      threshold: 0,
-    };
+    if (pathname === "/about") setActiveNav("Doctors");
+    else if (pathname === "/services") setActiveNav("Services");
+    else if (pathname === "/membership") setActiveNav("Membership");
+    else if (pathname === "/" && !window.location.hash) setActiveNav("Home");
+  }, [pathname]);
 
-    const handleIntersect: IntersectionObserverCallback = (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const id = entry.target.getAttribute("id");
-          const matchedItem = navItems.find((item) => item.href === `#${id}`);
-          if (matchedItem) {
-            setActiveNav(matchedItem.name);
-          }
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(handleIntersect, observerOptions);
-
-    navItems.forEach((item) => {
-      const targetId = item.href.replace("#", "");
-      const element = document.getElementById(targetId);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  // 3. Smooth Scroll Handler
-  const scrollToSection = (
+  const handleNavigation = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
-    name: string
+    item: (typeof navItems)[0]
   ) => {
     e.preventDefault();
-    if (name) setActiveNav(name);
     setMobileMenuOpen(false);
-
-    const targetId = href.replace("#", "");
-    const targetElement = document.getElementById(targetId);
-
-    if (targetElement) {
-      setTimeout(() => {
-        const headerOffset = 80;
-        const elementPosition = targetElement.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
-      }, 100);
+    setActiveNav(item.name);
+    if (!item.hash) {
+      router.push(item.href);
+      return;
+    }
+    if (pathname === "/") {
+      document.getElementById(item.hash.replace("#", ""))?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      router.push(item.href);
     }
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18">
-          {/* Brand Logo */}
-          <a
-            href="#hero"
-            onClick={(e) => scrollToSection(e, "#hero", "Home")}
-            className="flex items-center transition-transform active:scale-95 shrink-0 cursor-pointer"
-          >
-            <Image
-              src="/precious-md-new-logo.png"
-              alt="Precious MD Dermatology Logo"
-              width={250}
-              height={180}
-              priority
-              className="w-auto h-9 sm:h-10 object-contain"
-            />
-          </a>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
+    >
+      <div
+        className={`w-full transition-all duration-500 ${isScrolled
+            ? "bg-[#C88F9A]/95 backdrop-blur-md shadow-lg shadow-[#C88F9A]/20"
+            : "bg-[#C88F9A]"
+          }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
 
-          {/* Desktop Navigation - Clean Text Links */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {navItems.map((item) => {
-              const isActive = activeNav === item.name;
-
-              return (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  onClick={(e) => scrollToSection(e, item.href, item.name)}
-                  className={`relative text-sm font-sans font-medium transition-colors duration-200 cursor-pointer ${isActive
-                    ? "text-[#CD9581]"
-                    : "text-slate-800 hover:text-[#CD9581]"
-                    }`}
-                >
-                  {item.name}
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeUnderline"
-                      className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-[#CD9581]"
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </a>
-              );
-            })}
-          </nav>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 shrink-0">
+            {/* Logo */}
             <a
-              href="#booking"
-              onClick={(e) => {
-                e.preventDefault();
-                onBookClick?.();
-              }}
-              className="inline-flex items-center gap-2 bg-[#CD9581] hover:bg-[#B8846F] text-white font-sans text-sm font-semibold px-6 py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer"
+              href="/"
+              onClick={(e) => handleNavigation(e, navItems[0])}
+              className="flex items-center shrink-0 cursor-pointer group"
             >
-              <Calendar className="w-4 h-4 text-white/90" />
-              <span>Book Slot</span>
+              <Image
+                src="/precious-md-rose-whilte-logo.png"
+                alt="Precious MD Logo"
+                width={140}
+                height={42}
+                priority
+                className="w-auto h-8 sm:h-9 object-contain transition-opacity duration-200 group-hover:opacity-80"
+              />
             </a>
 
-            {/* Hamburger Icon */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="lg:hidden p-2 text-slate-700 hover:text-[#CD9581] focus:outline-none cursor-pointer transition-colors"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Drawer */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden border-t border-slate-200 bg-white"
-          >
-            <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
               {navItems.map((item) => {
                 const isActive = activeNav === item.name;
                 return (
                   <a
                     key={item.name}
                     href={item.href}
-                    onClick={(e) => scrollToSection(e, item.href, item.name)}
-                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive
-                      ? "bg-[#CD9581]/10 text-[#CD9581] font-semibold"
-                      : "text-slate-800 hover:bg-slate-50 hover:text-[#CD9581]"
+                    onClick={(e) => handleNavigation(e, item)}
+                    className={`relative text-white text-[13px] tracking-wide transition-all duration-200 cursor-pointer group ${isActive ? "font-semibold" : "font-normal opacity-85 hover:opacity-100"
+                      }`}
+                  >
+                    {item.name}
+                    <span
+                      className={`absolute -bottom-1 left-0 h-[1.5px] bg-white rounded-full transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"
+                        }`}
+                    />
+                  </a>
+                );
+              })}
+            </nav>
+
+            {/* Right: Book Now button */}
+            <div className="hidden lg:flex items-center">
+              <button
+                type="button"
+                onClick={() => onBookClick?.()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#C88F9A] hover:bg-[#FAF8F5] text-xs font-semibold rounded-full transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                Book Now
+              </button>
+            </div>
+
+            {/* Mobile toggle */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="lg:hidden bg-[#C88F9A]/95 backdrop-blur-md border-t border-white/20 overflow-hidden"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-1">
+              {navItems.map((item) => {
+                const isActive = activeNav === item.name;
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={(e) => handleNavigation(e, item)}
+                    className={`block px-4 py-3 rounded-xl text-white text-sm transition-all cursor-pointer ${isActive
+                        ? "font-semibold bg-white/15"
+                        : "font-normal hover:bg-white/10"
                       }`}
                   >
                     {item.name}
                   </a>
                 );
               })}
+
+              <div className="pt-3 border-t border-white/20">
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); onBookClick?.(); }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-[#C88F9A] rounded-xl font-semibold text-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Book Now
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
