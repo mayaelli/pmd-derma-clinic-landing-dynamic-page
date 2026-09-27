@@ -1,8 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "55mb",
+    },
+    proxyClientMaxBodySize: "55mb",
+  },
   images: {
     qualities: [75, 95],
-    remotePatterns: [ 
+    remotePatterns: [
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',

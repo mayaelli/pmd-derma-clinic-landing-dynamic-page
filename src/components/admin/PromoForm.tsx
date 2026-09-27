@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { Plus, Trash2, Upload, Calendar, Tag, X } from "lucide-react";
+import { Plus, Trash2, Upload, Calendar, Tag, X, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { uploadPromoImage } from "@/app/admin/manage/actions";
 
 export interface PromoItemInput {
   name: string;
@@ -41,24 +42,40 @@ export function PromoForm({
     promoForm.pubmatImage || null
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showItemsSection, setShowItemsSection] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
 
   // Safely guard items array against undefined
   const currentItems = promoForm?.items || [];
 
   // File Upload Handler
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImagePreview(base64String);
-        setPromoForm((prev: PromoFormData) => ({
-          ...prev,
-          pubmatImage: base64String,
-        }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Show a local blob preview immediately so the user sees feedback
+    const localPreview = URL.createObjectURL(file);
+    setImagePreview(localPreview);
+    setImageUploading(true);
+
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const publicUrl = await uploadPromoImage(fd);
+
+      // Replace blob preview with the real storage URL
+      URL.revokeObjectURL(localPreview);
+      setImagePreview(publicUrl);
+      setPromoForm((prev: PromoFormData) => ({ ...prev, pubmatImage: publicUrl }));
+    } catch (err: any) {
+      // Upload failed — clear preview and notify
+      URL.revokeObjectURL(localPreview);
+      setImagePreview(null);
+      setPromoForm((prev: PromoFormData) => ({ ...prev, pubmatImage: "" }));
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      alert("Image upload failed: " + err.message);
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -181,8 +198,11 @@ export function PromoForm({
           {/* File Upload Box */}
           <div>
             <label className="block text-xs font-bold text-[#333D29] mb-1.5 sm:mb-2">
-              Poster Image Upload
+              Poster Image Upload *
             </label>
+            <p className="text-[10px] text-[#738285] mb-2">
+              Upload your promo/package design. For multi-page packages, create a single tall image.
+            </p>
             <input
               type="file"
               ref={fileInputRef}
@@ -195,7 +215,8 @@ export function PromoForm({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-[42px] px-3.5 rounded-xl border border-dashed border-[#E5BCA9] bg-[#FDFBF7] hover:bg-[#FAF7F2] text-xs text-[#908A94] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                disabled={imageUploading}
+                className="w-full h-[42px] px-3.5 rounded-xl border border-dashed border-[#E5BCA9] bg-[#FDFBF7] hover:bg-[#FAF7F2] text-xs text-[#908A94] font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Upload className="w-4 h-4 text-[#C87D87]" />
                 <span>Upload Poster Image</span>
@@ -210,14 +231,22 @@ export function PromoForm({
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-xs text-[#333D29] truncate font-medium">
-                    Poster Uploaded
+                  <span className="text-xs text-[#333D29] truncate font-medium flex items-center gap-1.5">
+                    {imageUploading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin text-[#C87D87]" />
+                        Uploading…
+                      </>
+                    ) : (
+                      "Poster Uploaded"
+                    )}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                  disabled={imageUploading}
+                  className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Remove Image"
                 >
                   <X className="w-4 h-4" />
@@ -231,12 +260,14 @@ export function PromoForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
           <div>
             <label className="block text-xs font-bold text-[#333D29] mb-1.5 sm:mb-2">
-              Display Validity Text *
+              Display Validity Text
             </label>
+            <p className="text-[10px] text-[#738285] mb-1.5">
+              Optional. Leave empty for permanent packages without time restrictions.
+            </p>
             <input
               type="text"
-              required
-              placeholder="e.g. Until Oct 31, 2026"
+              placeholder="e.g. Until Oct 31, 2026 or Available Year-Round"
               value={promoForm.validity || ""}
               onChange={(e) =>
                 setPromoForm({ ...promoForm, validity: e.target.value })
@@ -263,105 +294,128 @@ export function PromoForm({
           </div>
         </div>
 
-        {/* Itemized Pricing Section */}
+        {/* Itemized Pricing Section (Optional - Collapsible) */}
         <div className="pt-2 border-t border-[#F2ECE4]">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <label className="block text-xs font-bold text-[#333D29]">
-                Package Items & Pricing Rates *
-              </label>
-              <p className="text-[11px] text-[#738285]">
-                List treatments included in this promo package.
+          <button
+            type="button"
+            onClick={() => setShowItemsSection(!showItemsSection)}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-[#FAF7F2] hover:bg-[#F3EFEA] transition-colors cursor-pointer"
+          >
+            <div className="text-left">
+              <div className="text-xs font-bold text-[#333D29] flex items-center gap-2">
+                <span>Package Items & Pricing (Optional)</span>
+                <span className="text-[10px] font-normal text-[#738285] bg-white px-2 py-0.5 rounded-md">
+                  Image-only promos can skip this
+                </span>
+              </div>
+              <p className="text-[10px] text-[#738285] mt-0.5">
+                {showItemsSection
+                  ? "Click to hide itemized pricing section"
+                  : "Click to add individual treatment items with prices"}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleAddItem}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FAF7F2] border border-[#E5BCA9]/50 text-[#2D2B30] text-xs font-semibold hover:bg-[#CD9581] hover:text-white transition-all cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Item</span>
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {currentItems.length === 0 ? (
-              <div className="p-4 rounded-xl border border-dashed border-[#F2ECE4] text-center text-xs text-[#738285]">
-                No items added yet. Click &quot;Add Item&quot; to add rates.
-              </div>
+            {showItemsSection ? (
+              <ChevronUp className="w-4 h-4 text-[#908A94]" />
             ) : (
-              currentItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-12 gap-2 p-3 bg-[#FDFBF7] border border-[#F2ECE4] rounded-xl items-center"
-                >
-                  <div className="col-span-5 sm:col-span-4">
-                    <input
-                      type="text"
-                      required
-                      placeholder="Treatment Name"
-                      value={item.name || ""}
-                      onChange={(e) =>
-                        handleItemChange(index, "name", e.target.value)
-                      }
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
-                    />
-                  </div>
-
-                  <div className="col-span-3 sm:col-span-3">
-                    <input
-                      type="text"
-                      placeholder="Sessions (e.g. 3 sessions)"
-                      value={item.sessions || ""}
-                      onChange={(e) =>
-                        handleItemChange(index, "sessions", e.target.value)
-                      }
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
-                    />
-                  </div>
-
-                  <div className="col-span-2 sm:col-span-2">
-                    <input
-                      type="text"
-                      placeholder="Promo Price"
-                      value={item.price || ""}
-                      onChange={(e) =>
-                        handleItemChange(index, "price", e.target.value)
-                      }
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
-                    />
-                  </div>
-
-                  <div className="col-span-2 sm:col-span-2">
-                    <input
-                      type="text"
-                      placeholder="Orig. Price"
-                      value={item.originalPrice || ""}
-                      onChange={(e) =>
-                        handleItemChange(
-                          index,
-                          "originalPrice",
-                          e.target.value
-                        )
-                      }
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
-                    />
-                  </div>
-
-                  <div className="col-span-12 sm:col-span-1 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItem(index)}
-                      className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                      title="Delete item"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))
+              <ChevronDown className="w-4 h-4 text-[#908A94]" />
             )}
-          </div>
+          </button>
+
+          {showItemsSection && (
+            <div className="mt-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] text-[#738285]">
+                  List treatments included in this package (or leave empty for image-only promos).
+                </p>
+                <button
+                  type="button"
+                  onClick={handleAddItem}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FAF7F2] border border-[#E5BCA9]/50 text-[#2D2B30] text-xs font-semibold hover:bg-[#CD9581] hover:text-white transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Item</span>
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {currentItems.length === 0 ? (
+                  <div className="p-4 rounded-xl border border-dashed border-[#F2ECE4] text-center text-xs text-[#738285]">
+                    No items added. For image-only promos, you can skip this section.
+                  </div>
+                ) : (
+                  currentItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-12 gap-2 p-3 bg-[#FDFBF7] border border-[#F2ECE4] rounded-xl items-center"
+                    >
+                      <div className="col-span-5 sm:col-span-4">
+                        <input
+                          type="text"
+                          placeholder="Treatment Name"
+                          value={item.name || ""}
+                          onChange={(e) =>
+                            handleItemChange(index, "name", e.target.value)
+                          }
+                          className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
+                        />
+                      </div>
+
+                      <div className="col-span-3 sm:col-span-3">
+                        <input
+                          type="text"
+                          placeholder="Sessions (e.g. 3 sessions)"
+                          value={item.sessions || ""}
+                          onChange={(e) =>
+                            handleItemChange(index, "sessions", e.target.value)
+                          }
+                          className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
+                        />
+                      </div>
+
+                      <div className="col-span-2 sm:col-span-2">
+                        <input
+                          type="text"
+                          placeholder="Promo Price"
+                          value={item.price || ""}
+                          onChange={(e) =>
+                            handleItemChange(index, "price", e.target.value)
+                          }
+                          className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
+                        />
+                      </div>
+
+                      <div className="col-span-2 sm:col-span-2">
+                        <input
+                          type="text"
+                          placeholder="Orig. Price"
+                          value={item.originalPrice || ""}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "originalPrice",
+                              e.target.value
+                            )
+                          }
+                          className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-[#F2ECE4] bg-white focus:outline-none focus:border-[#E48EAB]"
+                        />
+                      </div>
+
+                      <div className="col-span-12 sm:col-span-1 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(index)}
+                          className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          title="Delete item"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Submit */}
@@ -370,7 +424,7 @@ export function PromoForm({
             <button
               type="button"
               onClick={onCancel}
-              disabled={loading}
+              disabled={loading || imageUploading}
               className="inline-flex items-center gap-2 px-5 py-3 border border-[#F2ECE4] text-[#738285] hover:bg-[#F3EFEA] hover:text-[#333D29] text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
             >
               Cancel
@@ -378,11 +432,15 @@ export function PromoForm({
           )}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || imageUploading}
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#CD9581] hover:bg-[#B8846F] text-white text-xs font-bold rounded-xl shadow-md shadow-[#CD9581]/20 transition-all cursor-pointer disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
-            {loading ? (editingId ? "Saving…" : "Publishing…") : (editingId ? "Save Changes" : "Publish Promo")}
+            {imageUploading
+              ? "Uploading image…"
+              : loading
+                ? (editingId ? "Saving…" : "Publishing…")
+                : (editingId ? "Save Changes" : "Publish Promo")}
           </button>
         </div>
       </form>

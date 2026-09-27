@@ -1,24 +1,20 @@
-// Server component — data is fetched on the server on every request,
-// so revalidatePath("/") in server actions immediately reflects changes.
 import { getServicesServer } from "@/lib/getServicesServer";
 import { getPromosServer } from "@/lib/getPromosServer";
-import { getFeedbacksServer } from "@/lib/getFeedbacksServer";
+import { getReelsServer } from "@/lib/getReelsServer";
 import HomeClient from "@/components/HomeClient";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
-  const [servicesData, promosData, feedbacksData] = await Promise.all([
+  const [servicesData, promosData, reelsData] = await Promise.all([
     getServicesServer(),
     getPromosServer(),
-    getFeedbacksServer(),
+    getReelsServer(),
   ]);
 
   return (
     <HomeClient
-      servicesData={servicesData}
+      bentoCards={servicesData.bentoCards || []}
       promosData={promosData}
-      feedbacksData={feedbacksData}
+      reelsData={reelsData}
     />
   );
 }

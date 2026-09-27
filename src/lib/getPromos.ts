@@ -20,7 +20,7 @@ export interface PromoCampaign {
 }
 
 // Parse the pipe-delimited items string stored in DB back into PromoItem[]
-// Format per item: "Name | sessions | price | originalPrice(optional)"
+// Format per item: "Name|sessions|price|originalPrice(optional)"
 // Items are separated by ";"
 function parseItems(raw: string | null): PromoItem[] {
   if (!raw || raw.trim() === "") return [];
@@ -59,7 +59,7 @@ export async function getPromos(): Promise<PromoCampaign[]> {
       id: row.id,
       title: row.title || "",
       subtitle: row.subtitle || undefined,
-      validity: row.validity || row.discount_tag || "Limited Time",
+      validity: row.validity || "",
       validUntil: row.valid_until || row.expiry_date || undefined,
       pubmatImage: row.pubmat_image || "/precious-md-promo.jpg",
       badge: row.badge || row.discount_tag || "",

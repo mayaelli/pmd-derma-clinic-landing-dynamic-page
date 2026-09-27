@@ -103,10 +103,12 @@ export function PromoList({
                     {promo.subtitle && (
                       <p className="text-[11px] text-[#738285] truncate mt-0.5">{promo.subtitle}</p>
                     )}
-                    <div className="flex items-center gap-1.5 mt-1 text-[10px] text-[#908A94]">
-                      <Calendar className="w-3 h-3 text-[#C87D87]" />
-                      <span>{promo.validity}</span>
-                    </div>
+                    {promo.validity && (
+                      <div className="flex items-center gap-1.5 mt-1 text-[10px] text-[#908A94]">
+                        <Calendar className="w-3 h-3 text-[#C87D87]" />
+                        <span>{promo.validity}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

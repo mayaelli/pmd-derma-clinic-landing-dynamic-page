@@ -1,402 +1,372 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  X,
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  MessageCircle,
-  Mail,
-  Phone,
-  Info,
-  Clock,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { X, Calendar, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Sparkles } from "lucide-react";
+import { AppointmentPicker } from "./AppointmentPicker";
+import { format } from "date-fns";
 
-// Google Calendar Config - MOVED TO ENVIRONMENT VARIABLES FOR SECURITY
-const GOOGLE_CALENDAR_ID = process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID || "";
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
-
-interface ProcedureBoardModalProps {
+interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export interface ProcedureEvent {
-  id: string;
-  date: string; // YYYY-MM-DD
-  title: string;
-  time: string;
-  type: "hair" | "surgery" | "aesthetic" | "wound";
-}
-
-export function BookingModal({ isOpen, onClose }: ProcedureBoardModalProps) {
+export function BookingModal({ isOpen, onClose }: BookingModalProps) {
+  const [view, setView] = useState<"tracker" | "form">("tracker");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedSlot, setSelectedSlot] = useState<ProcedureEvent | null>(null);
-  const [events, setEvents] = useState<ProcedureEvent[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [apiError, setApiError] = useState<string | null>(null);
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
-  // Calendar Helpers
+  const [formData, setFormData] = useState({
+    patientName: "",
+    phone: "",
+    email: "",
+    doctor: "Dr. Precious Imam, MD, FPDS",
+    service: "General Consultation",
+    date: "",
+    timeSlot: "10:00 AM",
+    notes: "",
+  });
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("default", { month: "long" });
 
-  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-  const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-
-  // Fetch events live from Google Calendar whenever modal opens or month changes
   useEffect(() => {
-    async function fetchCalendarEvents() {
-      if (!isOpen) return;
+    if (!isOpen) return;
+    async function loadSurgeries() {
       setLoading(true);
-      setApiError(null);
-
-      // Define start and end of the currently viewed month
       const timeMin = new Date(year, month, 1).toISOString();
       const timeMax = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
-
+      const timestamp = Date.now();
       try {
-        const response = await fetch(
-          `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
-            GOOGLE_CALENDAR_ID
-          )}/events?key=${API_KEY}&singleEvents=true&orderBy=startTime&timeMin=${timeMin}&timeMax=${timeMax}`
+        const res = await fetch(
+          `/api/calendar?timeMin=${timeMin}&timeMax=${timeMax}&t=${timestamp}`,
+          { cache: "no-store" }
         );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error?.message || "Failed to fetch calendar events");
-        }
-
-        if (data.items) {
-          const parsedEvents: ProcedureEvent[] = data.items.map((item: any) => {
-            const start = item.start.dateTime || item.start.date;
-            const eventDate = new Date(start);
-
-            // Format YYYY-MM-DD using local time
-            const localYear = eventDate.getFullYear();
-            const localMonth = String(eventDate.getMonth() + 1).padStart(2, "0");
-            const localDay = String(eventDate.getDate()).padStart(2, "0");
-            const localDateString = `${localYear}-${localMonth}-${localDay}`;
-
-            // Automatic badge categorization based on keywords in event title
-            const titleLower = (item.summary || "").toLowerCase();
-            let type: ProcedureEvent["type"] = "aesthetic";
-
-            if (titleLower.includes("hair") || titleLower.includes("fue")) {
-              type = "hair";
-            } else if (
-              titleLower.includes("surgery") ||
-              titleLower.includes("excision") ||
-              titleLower.includes("derm")
-            ) {
-              type = "surgery";
-            } else if (titleLower.includes("wound")) {
-              type = "wound";
-            }
-
-            return {
-              id: item.id,
-              date: localDateString,
-              title: item.summary || "Scheduled Procedure",
-              time: item.start.dateTime
-                ? eventDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                : "All Day",
-              type,
-            };
-          });
-
-          setEvents(parsedEvents);
-        }
-      } catch (error: any) {
-        console.error("Error loading Google Calendar events:", error);
-        setApiError(error.message || "Could not load calendar events.");
+        const data = await res.json();
+        if (data.events) setEvents(data.events);
+      } catch (err) {
+        console.error("Failed to load surgeries", err);
       } finally {
         setLoading(false);
       }
     }
-
-    fetchCalendarEvents();
+    loadSurgeries();
   }, [isOpen, year, month]);
 
-  // Handle ESC key and scroll locking
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "unset";
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) setSubmitted(true);
+    } catch (err) {
+      console.error("Booking error:", err);
+    } finally {
+      setSubmitting(false);
     }
-
-    return () => {
-      document.body.style.overflow = "unset";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  const badgeStyles = {
-    hair: "bg-[#E48EAB] text-white border-[#E48EAB]",
-    surgery: "bg-[#908A94] text-white border-[#908A94]",
-    aesthetic: "bg-[#F8BFC5] text-[#908A94] border-[#F8BFC5]",
-    wound: "bg-[#E3E4E8] text-[#333D29] border-[#E3E4E8]",
   };
 
+  if (!isOpen) return null;
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-[#908A94]/40 backdrop-blur-md"
-          />
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
+      <div className="relative w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] bg-[#FAF8F5] sm:rounded-3xl shadow-2xl border border-[#E8E2D9] flex flex-col overflow-hidden">
 
-          {/* Modal Container */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 15 }}
-            transition={{ type: "spring", duration: 0.3 }}
-            className="relative z-10 w-full max-w-5xl h-[94vh] max-h-[900px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-200"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 bg-white/90 backdrop-blur-md border-b border-[#F0C4CB]/60 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#FAF0F2] rounded-2xl border border-[#F0C4CB]/60">
-                  <CalendarIcon className="w-5 h-5 text-[#C87D87]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-base sm:text-lg font-bold text-[#333D29]">
-                      Live Surgery & Procedure Board
-                    </h3>
-                    <span className="inline-flex items-center gap-1 bg-white border border-slate-200 text-slate-700 px-2.5 py-0.5 rounded-md text-[10px] font-semibold">
-                      <Sparkles className="w-3 h-3" /> Live Sync
-                    </span>
-                  </div>
-                  <p className="text-xs font-sans text-[#525B44]">
-                    Precious MD Dermatology & Aesthetic Center
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={onClose}
-                className="p-2 text-[#333D29] hover:text-[#C87D87] hover:bg-[#FAF0F2] rounded-full transition-colors cursor-pointer"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        {/* ── Header ──────────────────────────────────────────────────────── */}
+        <div className="flex items-center justify-between px-5 sm:px-7 py-4 sm:py-5 border-b border-[#E8E2D9] bg-white shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#FCE8E6] flex items-center justify-center shrink-0">
+              <Calendar className="w-4 h-4 text-[#C87D87]" />
             </div>
-
-            {/* Banner */}
-            <div className="bg-[#FAF0F2] px-5 py-2 border-b border-[#F0C4CB]/40 flex items-center gap-2 shrink-0 text-xs text-[#908A94]">
-              <Info className="w-4 h-4 text-[#C87D87] shrink-0" />
-              <p className="font-medium">
-                <span className="font-semibold text-[#C87D87]">Notice:</span> Click
-                any scheduled day below to preview procedure times, then reach out on
-                Messenger or WhatsApp to inquire or book.
+            <div>
+              <h3 className="font-serif font-semibold text-base text-[#1A1817]">
+                {view === "tracker" ? "Live Surgery Schedule" : "Request a Consultation"}
+              </h3>
+              <p className="text-[10px] text-[#706A63] font-light">
+                Precious MD Dermatology Center
               </p>
             </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full text-[#706A63] hover:text-[#1A1817] hover:bg-[#F7F4EF] transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
-            {/* Main Interactive Calendar Area */}
-            <div className="flex-1 p-4 sm:p-5 overflow-y-auto bg-white/80 flex flex-col gap-4 relative">
-              {/* Controls Bar & Legend */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#FAF0F2]/80 p-3 rounded-2xl border border-[#F0C4CB]/50">
-                {/* Month Navigator */}
-                <div className="flex items-center gap-3">
-                  <h4 className="font-serif text-base sm:text-lg font-bold text-[#333D29]">
+        {/* ── Tab switcher ────────────────────────────────────────────────── */}
+        <div className="flex border-b border-[#E8E2D9] bg-white px-5 sm:px-7 gap-1 shrink-0">
+          {(["tracker", "form"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setView(tab)}
+              className={`pb-3 pt-2.5 px-3 text-xs font-semibold border-b-2 transition-all cursor-pointer ${view === tab
+                ? "border-[#C87D87] text-[#C87D87]"
+                : "border-transparent text-[#706A63] hover:text-[#1A1817]"
+                }`}
+            >
+              {tab === "tracker" ? "Live Surgery Board" : "Direct Appointment Request"}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Body ────────────────────────────────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-5 sm:p-7">
+
+            {/* ── TRACKER VIEW ──────────────────────────────────────────── */}
+            {view === "tracker" && (
+              <div className="space-y-5">
+
+                {/* Month navigation */}
+                <div className="flex items-center justify-between">
+                  <h4 className="font-serif text-lg font-semibold text-[#1A1817]">
                     {monthName} {year}
                   </h4>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={handlePrevMonth}
-                      className="p-1.5 rounded-full bg-white border border-[#F0C4CB] text-[#908A94] hover:bg-[#F8BFC5]/30 transition-colors cursor-pointer"
+                      onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
+                      className="w-8 h-8 rounded-full border border-[#E8E2D9] bg-white hover:bg-[#FCE8E6] hover:border-[#C87D87] flex items-center justify-center transition-all cursor-pointer"
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      <ChevronLeft className="w-4 h-4 text-[#706A63]" />
                     </button>
                     <button
-                      onClick={handleNextMonth}
-                      className="p-1.5 rounded-full bg-white border border-[#F0C4CB] text-[#908A94] hover:bg-[#F8BFC5]/30 transition-colors cursor-pointer"
+                      onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
+                      className="w-8 h-8 rounded-full border border-[#E8E2D9] bg-white hover:bg-[#FCE8E6] hover:border-[#C87D87] flex items-center justify-center transition-all cursor-pointer"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-4 h-4 text-[#706A63]" />
                     </button>
                   </div>
                 </div>
 
-                {/* Legend Badges */}
-                <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#E48EAB] text-white font-semibold">
-                    Hair Restoration
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#908A94] text-white font-semibold">
-                    Derm Surgery
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#F8BFC5] text-[#908A94] font-semibold border border-[#F8BFC5]">
-                    Laser &amp; Aesthetic
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#E3E4E8] text-[#333D29] font-semibold">
-                    Wound Care
-                  </span>
+                {/* Calendar grid */}
+                {loading ? (
+                  <div className="flex justify-center py-16">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#C87D87]" />
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-[#E8E2D9] overflow-hidden bg-white">
+                    {/* Day headers */}
+                    <div className="grid grid-cols-7 border-b border-[#E8E2D9]">
+                      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                        <div key={d} className="py-2 text-center text-[10px] font-bold text-[#706A63] uppercase tracking-wider">
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Day cells */}
+                    <div className="grid grid-cols-7">
+                      {Array.from({ length: firstDay }).map((_, i) => (
+                        <div key={`blank-${i}`} className="min-h-[64px] sm:min-h-[72px] bg-[#FDFCFA] border-b border-r border-[#F2ECE8]" />
+                      ))}
+
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const day = i + 1;
+                        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                        const dayEvents = events.filter((e) => e.date === dateStr);
+                        const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+
+                        return (
+                          <div
+                            key={day}
+                            className="min-h-[64px] sm:min-h-[72px] p-1.5 border-b border-r border-[#F2ECE8] flex flex-col bg-white hover:bg-[#FDFCFA] transition-colors"
+                          >
+                            <span className={`text-[11px] font-semibold self-start mb-1 w-5 h-5 flex items-center justify-center rounded-full ${isToday
+                              ? "bg-[#C87D87] text-white"
+                              : "text-[#4A4440]"
+                              }`}>
+                              {day}
+                            </span>
+                            <div className="space-y-0.5 flex-1">
+                              {dayEvents.map((e) => (
+                                <div
+                                  key={e.id}
+                                  title={e.title}
+                                  className="group relative bg-[#FCE8E6] text-[#A65B66] text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md font-semibold truncate cursor-pointer hover:bg-[#C87D87] hover:text-white transition-colors leading-tight"
+                                >
+                                  {e.title}
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 w-max max-w-[160px] bg-[#1A1817] text-white text-[10px] px-2 py-1.5 rounded-lg shadow-xl z-30 whitespace-normal break-words">
+                                    {e.title}
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1A1817]" />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Legend + CTA */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#E8E2D9]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm bg-[#FCE8E6]" />
+                    <span className="text-xs text-[#706A63]">Surgery / blocked — book early to secure your slot</span>
+                  </div>
+                  <button
+                    onClick={() => setView("form")}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#C87D87] hover:bg-[#b8707a] text-white text-xs font-semibold rounded-full transition-all shadow-sm hover:shadow-md cursor-pointer shrink-0"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    Request Appointment
+                  </button>
                 </div>
               </div>
+            )}
 
-              {/* API Error Alert */}
-              {apiError && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{apiError} (Ensure calendar permissions are set to public)</span>
-                </div>
-              )}
-
-              {/* Loading State Overlay */}
-              {loading ? (
-                <div className="flex-1 flex flex-col items-center justify-center py-20 text-[#908A94] gap-2">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#C87D87]" />
-                  <p className="text-xs font-semibold">Syncing calendar events...</p>
+            {/* ── FORM VIEW ─────────────────────────────────────────────── */}
+            {view === "form" && (
+              submitted ? (
+                <div className="flex flex-col items-center justify-center py-14 text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-[#FCE8E6] flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8 text-[#C87D87]" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-serif text-xl font-semibold text-[#1A1817]">Request Sent!</h4>
+                    <p className="text-sm text-[#706A63] max-w-sm font-light">
+                      Our team will confirm your appointment via SMS and email shortly.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setSubmitted(false); setView("tracker"); }}
+                    className="mt-2 px-5 py-2.5 border border-[#E8E2D9] text-[#706A63] hover:bg-[#F7F4EF] text-xs font-medium rounded-full transition-colors cursor-pointer"
+                  >
+                    ← Back to Schedule
+                  </button>
                 </div>
               ) : (
-                /* Monthly Grid View */
-                <div className="grid grid-cols-7 gap-1 sm:gap-2">
-                  {/* Day Names */}
-                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                    <div
-                      key={day}
-                      className="text-center text-[11px] font-bold text-[#908A94] py-1 uppercase tracking-wider"
-                    >
-                      {day}
+                <form onSubmit={handleSubmit} className="space-y-4">
+
+                  {/* Attending physician — read-only highlight */}
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#FCE8E6]/50 border border-[#E5BCA9]/40">
+                    <Sparkles className="w-3.5 h-3.5 text-[#C87D87] shrink-0" />
+                    <div>
+                      <p className="text-[10px] font-medium text-[#C87D87] tracking-wide uppercase">Attending Physician</p>
+                      <p className="text-sm font-serif font-semibold text-[#1A1817] leading-tight">Dr. Precious Imam, MD, FPDS</p>
                     </div>
-                  ))}
+                  </div>
 
-                  {/* Blank Offset Cells */}
-                  {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-                    <div
-                      key={`blank-${index}`}
-                      className="min-h-[75px] sm:min-h-[90px] bg-[#FAF0F2]/20 rounded-xl border border-transparent"
+                  {/* Name + Phone */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-medium text-[#706A63] tracking-wide">
+                        Full Name <span className="text-[#C87D87]">*</span>
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="e.g. Maria Santos"
+                        className="w-full text-[13px] px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] bg-white text-[#1A1817] focus:outline-none focus:border-[#C87D87] focus:ring-2 focus:ring-[#C87D87]/10 transition-all placeholder:text-[#C8C3BC]"
+                        value={formData.patientName}
+                        onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-medium text-[#706A63] tracking-wide">
+                        Phone Number <span className="text-[#C87D87]">*</span>
+                      </label>
+                      <input
+                        required
+                        type="tel"
+                        placeholder="0917XXXXXXX"
+                        className="w-full text-[13px] px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] bg-white text-[#1A1817] focus:outline-none focus:border-[#C87D87] focus:ring-2 focus:ring-[#C87D87]/10 transition-all placeholder:text-[#C8C3BC]"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-medium text-[#706A63] tracking-wide">
+                      Email Address <span className="text-[#C87D87]">*</span>
+                    </label>
+                    <input
+                      required
+                      type="email"
+                      placeholder="maria@example.com"
+                      className="w-full text-[13px] px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] bg-white text-[#1A1817] focus:outline-none focus:border-[#C87D87] focus:ring-2 focus:ring-[#C87D87]/10 transition-all placeholder:text-[#C8C3BC]"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
-                  ))}
+                  </div>
 
-                  {/* Day Cells */}
-                  {Array.from({ length: daysInMonth }).map((_, index) => {
-                    const dayNumber = index + 1;
-                    const formattedDay =
-                      dayNumber < 10 ? `0${dayNumber}` : `${dayNumber}`;
-                    const formattedMonth =
-                      month + 1 < 10 ? `0${month + 1}` : `${month + 1}`;
-                    const dateString = `${year}-${formattedMonth}-${formattedDay}`;
+                  {/* Date & Time */}
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-medium text-[#706A63] tracking-wide">
+                      Preferred Date & Time <span className="text-[#C87D87]">*</span>
+                    </label>
+                    <div className="rounded-xl border border-[#E8E2D9] bg-white overflow-hidden">
+                      <AppointmentPicker
+                        selectedDate={formData.date ? new Date(formData.date) : undefined}
+                        selectedTime={formData.timeSlot}
+                        onSelect={(date, time) => {
+                          setFormData({
+                            ...formData,
+                            date: format(date, "yyyy-MM-dd"),
+                            timeSlot: time,
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
 
-                    const eventsOnDay = events.filter(
-                      (p) => p.date === dateString
-                    );
+                  {/* Notes */}
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-medium text-[#706A63] tracking-wide">
+                      Notes / Clinical Concerns
+                      <span className="text-[#B0AAA4] font-normal ml-1">(Optional)</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Describe any specific skin, hair, or nail concerns…"
+                      className="w-full text-[13px] px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] bg-white text-[#1A1817] focus:outline-none focus:border-[#C87D87] focus:ring-2 focus:ring-[#C87D87]/10 transition-all resize-none placeholder:text-[#C8C3BC]"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    />
+                  </div>
 
-                    return (
-                      <div
-                        key={dayNumber}
-                        className={`min-h-[75px] sm:min-h-[90px] p-1.5 rounded-xl border transition-all flex flex-col justify-between ${eventsOnDay.length > 0
-                          ? "bg-white border-[#F0C4CB] shadow-xs hover:shadow-md cursor-pointer"
-                          : "bg-white/40 border-[#F0C4CB]/30"
-                          }`}
-                      >
-                        <span className="text-xs font-bold text-[#333D29] self-start px-1">
-                          {dayNumber}
-                        </span>
+                  {/* Actions */}
+                  <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#E8E2D9]">
+                    <button
+                      type="button"
+                      onClick={() => setView("tracker")}
+                      className="text-[11px] font-medium text-[#706A63] hover:text-[#1A1817] transition-colors cursor-pointer"
+                    >
+                      ← View Schedule
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#C87D87] hover:bg-[#b8707a] text-white text-xs font-semibold rounded-full shadow-sm shadow-[#C87D87]/20 transition-all cursor-pointer disabled:opacity-60"
+                    >
+                      {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      {submitting ? "Sending…" : "Submit Request"}
+                    </button>
+                  </div>
+                </form>
+              )
+            )}
 
-                        {/* Procedure Badges */}
-                        <div className="space-y-1 my-auto">
-                          {eventsOnDay.map((evt) => (
-                            <motion.div
-                              key={evt.id}
-                              whileHover={{ scale: 1.02 }}
-                              onClick={() => setSelectedSlot(evt)}
-                              className={`px-1.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-semibold border leading-tight truncate ${badgeStyles[evt.type]
-                                }`}
-                              title={`${evt.title} (${evt.time})`}
-                            >
-                              <span className="block font-bold">{evt.title}</span>
-                              <span className="opacity-90 text-[8px] sm:text-[9px] font-normal flex items-center gap-0.5 mt-0.5">
-                                <Clock className="w-2.5 h-2.5 inline shrink-0" />
-                                {evt.time}
-                              </span>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Footer Inquiries & Contact Bar */}
-            <div className="p-4 bg-[#FAF0F2] border-t border-[#F0C4CB]/60 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-              <div className="text-center sm:text-left">
-                <p className="text-xs font-semibold text-[#333D29]">
-                  {selectedSlot ? (
-                    <span>
-                      Interested in{" "}
-                      <strong className="text-[#C87D87]">
-                        {selectedSlot.title} ({selectedSlot.date})
-                      </strong>
-                      ?
-                    </span>
-                  ) : (
-                    "Have a specific procedure date in mind?"
-                  )}
-                </p>
-                <p className="text-[11px] text-[#525B44]">
-                  Inquire directly on our social media or email platforms below.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <a
-                  href="https://m.me/preciousmdclinic"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0084FF] hover:bg-[#0073E6] text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Messenger</span>
-                </a>
-
-                <a
-                  href="https://wa.me/639531603724"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>WhatsApp</span>
-                </a>
-
-                <a
-                  href="mailto:preciousmdclinic@gmail.com"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#CD9581] hover:bg-[#B8846F] text-white text-xs font-semibold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer border border-[#CD9581]/30"
-                >
-                  <Mail className="w-3.5 h-3.5 text-white/80" />
-                  <span>Email</span>
-                </a>
-              </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
+      </div>
+    </div>
   );
 }
 

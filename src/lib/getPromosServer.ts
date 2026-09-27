@@ -1,7 +1,8 @@
 // src/lib/getPromosServer.ts
-// Server-side version — uses the server Supabase client so revalidatePath works.
-import { createClient } from "@/lib/supabase/server";
+// Server-side version with unstable_cache for cross-request caching
+import { createClient } from "@supabase/supabase-js";
 import type { PromoCampaign, PromoItem } from "@/lib/getPromos";
+import { unstable_cache } from "next/cache";
 
 function parseItems(raw: string | null): PromoItem[] {
   if (!raw || raw.trim() === "") return [];
@@ -22,9 +23,13 @@ function parseItems(raw: string | null): PromoItem[] {
     .filter((item) => item.name.length > 0);
 }
 
-export async function getPromosServer(): Promise<PromoCampaign[]> {
-  const supabase = await createClient();
+// Create a standalone public Supabase client for caching
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
+async function fetchPromosData(): Promise<PromoCampaign[]> {
   try {
     const { data, error } = await supabase
       .from("promos")
@@ -40,7 +45,7 @@ export async function getPromosServer(): Promise<PromoCampaign[]> {
       id: row.id,
       title: row.title || "",
       subtitle: row.subtitle || undefined,
-      validity: row.validity || row.discount_tag || "Limited Time",
+      validity: row.validity || "",
       validUntil: row.valid_until || row.expiry_date || undefined,
       pubmatImage: row.pubmat_image || "/precious-md-promo.jpg",
       badge: row.badge || row.discount_tag || "",
@@ -51,3 +56,13 @@ export async function getPromosServer(): Promise<PromoCampaign[]> {
     return [];
   }
 }
+
+// Wrap the fetch function with unstable_cache for 60-second revalidation
+export const getPromosServer = unstable_cache(
+  fetchPromosData,
+  ['promos'],
+  {
+    revalidate: 60,
+    tags: ['promos']
+  }
+);

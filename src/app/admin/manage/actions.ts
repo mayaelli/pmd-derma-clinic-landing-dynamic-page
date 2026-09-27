@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
+import { unstable_cache } from "next/cache";
 
 // ─── SERVICE RECORD TYPE ─────────────────────────────────────────────────────
 export interface ServiceRecord {
@@ -23,10 +25,17 @@ export interface AddPromoPayload {
   items: string;
 }
 
-// ─── 1. LIST SERVICES ────────────────────────────────────────────────────────
-export async function listServices(): Promise<ServiceRecord[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+// ─── LIST SERVICES ────────────────────────────────────────────────────────────
+// Use standalone public client for caching (RLS policies handle permissions)
+import { createClient as createPublicClient } from "@supabase/supabase-js";
+
+const publicSupabase = createPublicClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+async function fetchServicesFromDB(): Promise<ServiceRecord[]> {
+  const { data, error } = await publicSupabase
     .from("services")
     .select("id, name, category, description, image_url")
     .order("created_at", { ascending: false });
@@ -34,6 +43,15 @@ export async function listServices(): Promise<ServiceRecord[]> {
   if (error) throw new Error(error.message);
   return (data ?? []) as ServiceRecord[];
 }
+
+export const listServices = unstable_cache(
+  fetchServicesFromDB,
+  ["admin-services"],
+  {
+    tags: ["services", "admin-services"],
+    revalidate: 30, // Revalidate every 30 seconds for admin
+  }
+);
 
 // ─── 2. ADD SERVICE ──────────────────────────────────────────────────────────
 export async function addService(formData: FormData) {
@@ -108,6 +126,8 @@ export async function updateService(formData: FormData) {
 
   if (error) throw new Error(error.message);
   revalidatePath("/admin/manage");
+  updateTag("services");
+  updateTag("admin-services");
   return { success: true };
 }
 
@@ -127,6 +147,29 @@ export async function deleteService(id: string) {
   return { success: true };
 }
 
+// ─── UPLOAD PROMO IMAGE ───────────────────────────────────────────────────────
+export async function uploadPromoImage(formData: FormData): Promise<string> {
+  const supabase = await createClient();
+
+  const file = formData.get("file") as File;
+  if (!file || file.size === 0) throw new Error("No file provided");
+
+  const fileExt = file.name.split(".").pop();
+  const fileName = `promos/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from("service-images")
+    .upload(fileName, file);
+
+  if (uploadError) throw new Error(`Image Upload Error: ${uploadError.message}`);
+
+  const { data: publicUrlData } = supabase.storage
+    .from("service-images")
+    .getPublicUrl(uploadData.path);
+
+  return publicUrlData.publicUrl;
+}
+
 // ─── 5. ADD PROMO ────────────────────────────────────────────────────────────
 export async function addPromo(data: AddPromoPayload) {
   const supabase = await createClient();
@@ -138,8 +181,8 @@ export async function addPromo(data: AddPromoPayload) {
   const { error } = await supabase.from("promos").insert({
     title: data.title,
     subtitle: data.subtitle || null,
-    badge: data.badge,
-    validity: data.validity,
+    badge: data.badge || "PROMO",
+    validity: data.validity || null,
     valid_until: cleanValidUntil,
     pubmat_image: data.pubmatImage || null,
     items: data.items,
@@ -149,6 +192,8 @@ export async function addPromo(data: AddPromoPayload) {
 
   revalidatePath("/admin/manage");
   revalidatePath("/");
+  updateTag("promos");
+  updateTag("admin-promos");
   return { success: true };
 }
 
@@ -188,9 +233,8 @@ export interface PromoRecord {
 }
 
 // ─── LIST PROMOS ─────────────────────────────────────────────────────────────
-export async function listPromos(): Promise<PromoRecord[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+async function fetchPromosFromDB(): Promise<PromoRecord[]> {
+  const { data, error } = await publicSupabase
     .from("promos")
     .select("*")
     .order("created_at", { ascending: false });
@@ -198,6 +242,15 @@ export async function listPromos(): Promise<PromoRecord[]> {
   if (error) throw new Error(error.message);
   return (data ?? []) as PromoRecord[];
 }
+
+export const listPromos = unstable_cache(
+  fetchPromosFromDB,
+  ["admin-promos"],
+  {
+    tags: ["promos", "admin-promos"],
+    revalidate: 30, // Revalidate every 30 seconds for admin
+  }
+);
 
 // ─── UPDATE PROMO ────────────────────────────────────────────────────────────
 export async function updatePromo(id: string, data: AddPromoPayload) {
@@ -211,8 +264,8 @@ export async function updatePromo(id: string, data: AddPromoPayload) {
     .update({
       title: data.title,
       subtitle: data.subtitle || null,
-      badge: data.badge,
-      validity: data.validity,
+      badge: data.badge || "PROMO",
+      validity: data.validity || null,
       valid_until: cleanValidUntil,
       pubmat_image: data.pubmatImage || null,
       items: data.items,
@@ -223,6 +276,8 @@ export async function updatePromo(id: string, data: AddPromoPayload) {
 
   revalidatePath("/admin/manage");
   revalidatePath("/");
+  updateTag("promos");
+  updateTag("admin-promos");
   return { success: true };
 }
 
@@ -239,6 +294,8 @@ export async function deletePromo(id: string) {
 
   revalidatePath("/admin/manage");
   revalidatePath("/");
+  updateTag("promos");
+  updateTag("admin-promos");
   return { success: true };
 }
 
@@ -261,5 +318,7 @@ export async function togglePromoExpiry(id: string, expire: boolean) {
 
   revalidatePath("/admin/manage");
   revalidatePath("/");
+  updateTag("promos");
+  updateTag("admin-promos");
   return { success: true };
 }

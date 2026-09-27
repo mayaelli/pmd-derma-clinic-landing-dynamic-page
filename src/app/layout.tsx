@@ -1,28 +1,32 @@
 // app/layout.tsx
-import { Poppins, DM_Serif_Display } from "next/font/google";
+import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-// 1. Configure Poppins
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-poppins",
 });
 
-// 2. DM Serif Display — modern editorial serif, pairs cleanly with Poppins
-const dmSerif = DM_Serif_Display({
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-dm-serif",
 });
 
 export const viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-}
+};
 
+export const metadata = {
+  icons: {
+    icon: "/precious-md-rose-pink-logo.png",
+    apple: "/precious-md-rose-pink-logo.png",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -30,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${poppins.variable} ${dmSerif.variable}`}>
+    <html lang="en" className={`${poppins.variable} ${playfairDisplay.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

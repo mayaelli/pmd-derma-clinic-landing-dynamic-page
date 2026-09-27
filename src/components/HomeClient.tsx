@@ -4,39 +4,39 @@ import { useState } from "react";
 import BookingModal from "@/components/BookingModal";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import Services from "@/components/Services";
+import HomeBento from "@/components/HomeBento";
 import { Promos } from "@/components/Promos";
-import { Feedback } from "@/components/Feedback";
-import { DoctorHighlight } from "@/components/DoctorHighlight";
+import { Reels } from "@/components/Reels";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { Footer } from "@/components/Footer";
-import { ExtendedServiceItem } from "@/lib/getServicesServer";
+import { ExtendedServiceItem, BentoCardData } from "@/lib/getServicesServer";
 import { PromoCampaign } from "@/lib/getPromos";
-import { FeedbackItem } from "@/lib/getFeedbacks";
+import type { Reel } from "@/lib/reels";
 
 interface HomeClientProps {
-  servicesData: Record<string, ExtendedServiceItem[]>;
+  bentoCards: BentoCardData[];
   promosData: PromoCampaign[];
-  feedbacksData: FeedbackItem[];
+  reelsData: Reel[];
 }
 
-export default function HomeClient({ servicesData, promosData, feedbacksData }: HomeClientProps) {
+export default function HomeClient({ bentoCards, promosData, reelsData }: HomeClientProps) {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-white overflow-x-hidden">
       <Header onBookClick={() => setIsBookingOpen(true)} />
+
       <Hero onBookClick={() => setIsBookingOpen(true)} />
 
-      <Services
-        services={servicesData}
-        loading={false}
-        onBookClick={() => setIsBookingOpen(true)}
-      />
+      {/* 6-Card Bento Showcase */}
+      <HomeBento bentoCards={bentoCards} />
 
       <Promos promos={promosData} />
 
-      <Feedback initialFeedbacks={feedbacksData} />
-      <DoctorHighlight onBookClick={() => setIsBookingOpen(true)} />
+      <Reels reels={reelsData} />
+
+      <TestimonialsSection />
+
       <Footer />
 
       <BookingModal

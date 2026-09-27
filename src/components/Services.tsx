@@ -8,6 +8,7 @@ import {
   useTransition,
   useCallback,
 } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -23,6 +24,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
+  Tag,
 } from "lucide-react";
 import { ExtendedServiceItem } from "@/lib/getServices";
 import { SERVICE_CATEGORIES } from "@/config/clinicConfig";
@@ -35,9 +37,10 @@ const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
 
 const CATEGORY_COLORS: Record<string, string> = {
   hair: "bg-[#FFF0E8] text-[#C87D87] border-[#F0C4CB]",
-  wound: "bg-[#FAF0F2] text-[#C87D87] border-[#F4D3D8]",
-  aesthetic: "bg-[#F7EBEF] text-[#B55B67] border-[#EDC5CD]",
-  specialized: "bg-[#FFF5F7] text-[#C87D87] border-[#F4D3D8]",
+  facials: "bg-[#FAF0F2] text-[#C87D87] border-[#F4D3D8]",
+  lasers: "bg-[#F7EBEF] text-[#B55B67] border-[#EDC5CD]",
+  injectables: "bg-[#FFF5F7] text-[#C87D87] border-[#F4D3D8]",
+  specialized: "bg-[#F5F0FA] text-[#8A5BB5] border-[#E2D5F2]",
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -54,6 +57,7 @@ type ServiceWithCat = ExtendedServiceItem & { _cat: string };
 
 export default function Services({ services, loading = false, onBookClick }: ServicesProps) {
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
 
   // Data processing
   const activeServices = useMemo(
@@ -71,7 +75,7 @@ export default function Services({ services, loading = false, onBookClick }: Ser
     [activeServices, categories]
   );
 
-  // UI state - activeTab starts empty and auto-selects categories[0] via useEffect
+  // UI state
   const [activeTab, setActiveTab] = useState<string>("");
   const [viewMode, setViewMode] = useState<"categorized" | "all">("categorized");
   const [rawSearch, setRawSearch] = useState("");
@@ -87,11 +91,35 @@ export default function Services({ services, loading = false, onBookClick }: Ser
   // Auto-select the first category as default when data loads
   useEffect(() => {
     if (categories.length > 0 && !activeTab) {
-      setActiveTab(categories[0]);
+      // Check if there's a category in URL params
+      const catParam = searchParams.get("cat");
+      const matchingCat = categories.find(cat => cat === catParam);
+      setActiveTab(matchingCat || categories[0]);
     }
-  }, [categories, activeTab]);
+  }, [categories, activeTab, searchParams]);
 
-  // Modal accessibility: body scroll lock & keyboard escape
+  // Handle hash scroll to specific subcategory
+  useEffect(() => {
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith("#sub-")) {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Optional: highlight the element briefly
+          element.classList.add("ring-2", "ring-[#C87D87]", "rounded-xl");
+          setTimeout(() => {
+            element.classList.remove("ring-2", "ring-[#C87D87]", "rounded-xl");
+          }, 2000);
+        }
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [activeTab, services]);
+
+  // Modal accessibility
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && selectedService) {
@@ -128,7 +156,6 @@ export default function Services({ services, loading = false, onBookClick }: Ser
     return () => clearTimeout(id);
   }, [rawSearch]);
 
-  // Filter logic across names, descriptions, and category labels
   const query = search.trim().toLowerCase();
 
   const filteredAll = useMemo(() => {
@@ -141,7 +168,6 @@ export default function Services({ services, loading = false, onBookClick }: Ser
     });
   }, [allServices, query]);
 
-  // Grouped results by category for horizontal mode
   const categorizedResults = useMemo(() => {
     const selectedCat = activeTab || categories[0];
     const catsToRender = selectedCat ? [selectedCat] : [];
@@ -167,7 +193,6 @@ export default function Services({ services, loading = false, onBookClick }: Ser
       .filter((group) => group.items.length > 0);
   }, [activeServices, activeTab, categories, query]);
 
-  // Handlers
   const handleTabChange = useCallback((cat: string) => {
     startTransition(() => {
       setActiveTab(cat);
@@ -188,17 +213,19 @@ export default function Services({ services, loading = false, onBookClick }: Ser
     <section id="services" className="scroll-mt-20 bg-white py-12 border-b border-slate-200 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* ── Section Header ─────────────────────────────────────────────── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-          <div className="max-w-xl space-y-2.5">
-            <div className="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-900 px-3.5 py-1 rounded-lg text-xs font-sans font-semibold shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+          <div className="max-w-xl space-y-3">
+            <div className="inline-flex items-center gap-2 bg-[#FFF5F7] border border-[#F4D3D8] text-[#C87D87] px-4 py-2 rounded-full text-xs font-sans font-semibold shadow-sm">
+              <Sparkles className="w-4 h-4 shrink-0" />
               <span>Tailored Skin Treatments</span>
             </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#2D2B30] tracking-tight">
+            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-[#2D2B30] tracking-tight leading-tight">
               Clinical & Aesthetic Menu
             </h2>
-
+            <p className="text-sm text-slate-600 font-sans leading-relaxed">
+              Discover our comprehensive range of medical and aesthetic dermatology services
+            </p>
           </div>
 
           {/* Search & View Switcher */}
@@ -209,7 +236,7 @@ export default function Services({ services, loading = false, onBookClick }: Ser
                 {/* Search Bar */}
                 <div className="relative">
                   <div
-                    className="flex items-center bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden transition-all duration-300 ease-in-out"
+                    className="flex items-center bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden transition-all duration-300 ease-in-out"
                     style={{ width: searchOpen ? "min(260px, 50vw)" : "40px" }}
                   >
                     <button
@@ -253,7 +280,7 @@ export default function Services({ services, loading = false, onBookClick }: Ser
                 </div>
 
                 {/* View Mode Toggle */}
-                <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm shrink-0">
+                <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-xs shrink-0">
                   <button
                     onClick={() => handleViewChange("categorized")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${viewMode === "categorized"
@@ -281,7 +308,7 @@ export default function Services({ services, loading = false, onBookClick }: Ser
           )}
         </div>
 
-        {/* ── Category Filter Tabs ───────────────────────────────────────── */}
+        {/* Category Filter Tabs */}
         {hasData && !loading && categories.length > 0 && viewMode === "categorized" && (
           <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
             {categories.map((cat) => {
@@ -303,40 +330,10 @@ export default function Services({ services, loading = false, onBookClick }: Ser
           </div>
         )}
 
-        {/* ── Loading Skeleton ───────────────────────────────────────────── */}
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#F4D3D8]/50 flex flex-col animate-pulse overflow-hidden">
-                <div className="aspect-[16/10] w-full bg-[#FAF0F2]" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 w-3/4 rounded-full bg-[#FAF0F2]" />
-                  <div className="h-3 w-full rounded-full bg-[#FAF0F2]" />
-                  <div className="h-3 w-5/6 rounded-full bg-[#FAF0F2]" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Empty State ────────────────────────────────────────────────── */}
-        {!loading && !hasData && (
-          <div className="py-16 flex flex-col items-center justify-center text-center gap-3 bg-white rounded-2xl border border-slate-200">
-            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#C87D87]" />
-            </div>
-            <p className="font-serif text-base font-bold text-[#333D29]">Services Unavailable</p>
-            <p className="font-sans text-sm text-slate-700 max-w-xs">
-              Our service menu is currently being updated. Please check back soon or contact us directly.
-            </p>
-          </div>
-        )}
-
-        {/* ── Main Service Content ───────────────────────────────────────── */}
+        {/* Main Service Content */}
         {!loading && hasData && (
           <div className={isPending ? "opacity-60 pointer-events-none transition-opacity" : "transition-opacity"}>
 
-            {/* BY CATEGORY VIEW: Single Active Category Carousel */}
             {viewMode === "categorized" && (
               <>
                 {categorizedResults.length === 0 ? (
@@ -358,7 +355,6 @@ export default function Services({ services, loading = false, onBookClick }: Ser
               </>
             )}
 
-            {/* ALL SERVICES VIEW: Grid of all items */}
             {viewMode === "all" && (
               <>
                 {filteredAll.length === 0 ? (
@@ -382,7 +378,6 @@ export default function Services({ services, loading = false, onBookClick }: Ser
               </>
             )}
 
-            {/* Expand / Collapse Toggle (All Services Mode Only) */}
             {viewMode === "all" && filteredAll.length > 6 && (
               <div className="flex flex-col items-center mt-6 gap-2">
                 <button
@@ -396,7 +391,7 @@ export default function Services({ services, loading = false, onBookClick }: Ser
                   <motion.div
                     animate={{ rotate: expanded ? 180 : 0 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="w-8 h-8 rounded-full bg-white border border-[#F4D3D8] shadow-xs flex items-center justify-center text-[#C87D87] group-hover:border-[#C87D87]/40 group-hover:shadow-sm transition-all"
+                    className="w-8 h-8 rounded-full bg-white border border-[#F4D3D8] shadow-xs flex items-center justify-center text-[#C87D87] group-hover:border-[#C87D87]/40 group-hover:shadow-xs transition-all"
                   >
                     <ChevronDown className="w-4 h-4" />
                   </motion.div>
@@ -409,7 +404,7 @@ export default function Services({ services, loading = false, onBookClick }: Ser
 
       </div>
 
-      {/* ── Service Detail Modal ─────────────────────────────────────────── */}
+      {/* Detail Modal with Price Tag */}
       <AnimatePresence>
         {selectedService && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -436,24 +431,22 @@ export default function Services({ services, loading = false, onBookClick }: Ser
                 <X className="w-4 h-4" />
               </button>
 
-              {selectedService.image && (
-                <div className="relative aspect-[16/9] w-full rounded-t-3xl overflow-hidden bg-[#FFF0F2]">
-                  <Image
-                    src={selectedService.image}
-                    alt={selectedService.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 448px"
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              <ModalImageGallery service={selectedService} />
 
               <div className="p-6 space-y-5">
-                {"_cat" in selectedService && (selectedService as ServiceWithCat)._cat && (
-                  <span className={`inline-block text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${CATEGORY_COLORS[(selectedService as ServiceWithCat)._cat] ?? "bg-[#FFF0F2] text-[#C87D87] border-[#F4D3D8]"}`}>
-                    {CATEGORY_LABELS[(selectedService as ServiceWithCat)._cat] ?? (selectedService as ServiceWithCat)._cat}
-                  </span>
-                )}
+                <div className="flex items-center justify-between gap-2">
+                  {"_cat" in selectedService && (selectedService as ServiceWithCat)._cat && (
+                    <span className={`inline-block text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${CATEGORY_COLORS[(selectedService as ServiceWithCat)._cat] ?? "bg-[#FFF0F2] text-[#C87D87] border-[#F4D3D8]"}`}>
+                      {CATEGORY_LABELS[(selectedService as ServiceWithCat)._cat] ?? (selectedService as ServiceWithCat)._cat}
+                    </span>
+                  )}
+                  {selectedService.priceText && (
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#CD9581] bg-[#CD9581]/10 px-2.5 py-1 rounded-lg">
+                      <Tag className="w-3 h-3" />
+                      {selectedService.priceText}
+                    </span>
+                  )}
+                </div>
 
                 <div>
                   <h3 className="font-serif text-xl font-bold text-[#2D2B30] leading-snug">
@@ -464,54 +457,12 @@ export default function Services({ services, loading = false, onBookClick }: Ser
                   </p>
                 </div>
 
-                {selectedService.symptoms && selectedService.symptoms.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-sans text-[10px] font-bold text-[#C87D87] uppercase tracking-wider flex items-center gap-1.5">
-                      <Activity className="w-3.5 h-3.5 text-[#C87D87]" />
-                      Common Symptoms & Indications
-                    </h4>
-                    <ul className="space-y-1.5">
-                      {selectedService.symptoms.map((s, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#C87D87] shrink-0 mt-0.5" />
-                          <span>{s}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {selectedService.includes && selectedService.includes.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-sans text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                      <ClipboardList className="w-3.5 h-3.5 text-slate-600" />
-                      What Your Visit Includes
-                    </h4>
-                    <ul className="space-y-1.5">
-                      {selectedService.includes.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {selectedService.warning && (
-                  <div className="p-3.5 rounded-2xl bg-[#FFF5F7] border border-[#F4D3D8] text-[#C87D87] text-xs leading-relaxed">
-                    <span className="font-bold block mb-1">Clinical Note:</span>
-                    {selectedService.warning}
-                  </div>
-                )}
-
-                {/* Primary Action Button using Teal Accent */}
                 <button
                   onClick={() => {
                     setSelectedService(null);
                     onBookClick?.();
                   }}
-                  className="w-full py-3 bg-[#CD9581] hover:bg-[#B8846F] text-white text-xs font-semibold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 bg-[#CD9581] hover:bg-[#B8846F] text-white text-xs font-semibold rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Calendar className="w-3.5 h-3.5" />
                   <span>Book a Consultation</span>
@@ -551,7 +502,6 @@ function HorizontalCategoryRow({
 
   return (
     <div className="space-y-3">
-      {/* Category Subheader + Navigation Controls */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-2">
         <h3 className="font-serif text-lg font-bold text-[#2D2B30] flex items-center gap-2">
           <span>{title}</span>
@@ -575,7 +525,6 @@ function HorizontalCategoryRow({
         </div>
       </div>
 
-      {/* Horizontal Snap Carousel */}
       <div
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-[#F4D3D8] scrollbar-track-transparent"
@@ -652,20 +601,16 @@ function ServiceCard({
         </div>
 
         <div className={`border-t border-slate-200 flex items-center justify-between gap-2 ${compact ? "pt-2" : "pt-3"}`}>
-          {!compact && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onBookClick?.();
-              }}
-              className="px-3 py-1 rounded-lg bg-[#CD9581] hover:bg-[#B8846F] text-white text-[11px] font-semibold transition-all cursor-pointer shadow-xs"
-            >
-              Book
-            </button>
+          {service.priceText ? (
+            <span className="font-semibold text-[11px] text-[#CD9581] flex items-center gap-1">
+              <Tag className="w-3 h-3" />
+              {service.priceText}
+            </span>
+          ) : (
+            <span className={`font-semibold text-[#C87D87] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5 ${compact ? "text-[10px] ml-auto" : "text-[11px]"}`}>
+              Learn More →
+            </span>
           )}
-          <span className={`font-semibold text-[#C87D87] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5 ${compact ? "text-[10px] ml-auto" : "text-[11px]"}`}>
-            Learn More →
-          </span>
         </div>
       </div>
     </div>
@@ -726,8 +671,67 @@ function NoResults({ query, onClear }: { query: string; onClear: () => void }) {
         onClick={onClear}
         className="mt-1 text-xs font-semibold text-[#C87D87] hover:underline transition-all cursor-pointer"
       >
-        Clear filters & search
+        Clear filters &amp; search
       </button>
+    </div>
+  );
+}
+
+// ─── Modal Image Gallery ─────────────────────────────────────────────────────
+// Shows the cover image + a thumbnail strip when extra images exist.
+
+function ModalImageGallery({ service }: { service: ExtendedServiceItem }) {
+  const allImages = [
+    service.image,
+    ...(service.imageUrls || []),
+  ].filter(Boolean) as string[];
+
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  // Reset to cover whenever a different service is opened
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [service]);
+
+  if (allImages.length === 0) return null;
+
+  return (
+    <div>
+      {/* Main image */}
+      <div className="relative aspect-[16/9] w-full rounded-t-2xl overflow-hidden bg-[#FFF0F2]">
+        <Image
+          src={allImages[activeIdx]}
+          alt={service.name}
+          fill
+          sizes="(max-width: 768px) 100vw, 448px"
+          className="object-cover transition-opacity duration-300"
+        />
+      </div>
+
+      {/* Thumbnail strip — only rendered when there are extra images */}
+      {allImages.length > 1 && (
+        <div className="flex gap-2 px-4 py-3 border-b border-slate-100">
+          {allImages.map((src, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveIdx(idx)}
+              className={`relative w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${activeIdx === idx
+                  ? "border-[#C87D87] shadow-sm"
+                  : "border-transparent opacity-60 hover:opacity-100 hover:border-[#F4D3D8]"
+                }`}
+              aria-label={`View image ${idx + 1}`}
+            >
+              <Image
+                src={src}
+                alt={`${service.name} image ${idx + 1}`}
+                fill
+                sizes="56px"
+                className="object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -3,10 +3,9 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
-import { ServiceRecord } from "../../app/admin/manage/actions";
 
 interface DeleteModalProps {
-  service: ServiceRecord;
+  service: { id: string; name: string };
   loading: boolean;
   onConfirm: () => void;
   onCancel: () => void;

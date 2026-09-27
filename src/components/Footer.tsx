@@ -105,24 +105,24 @@ export function Footer() {
               <h4 className="font-serif text-xs font-bold text-[#333D29] tracking-wider uppercase">
                 Explore
               </h4>
-              <ul className="space-y-1.5 text-xs font-light text-[#4A4547]">
+              <ul className="space-y-0.5 text-xs font-light text-[#4A4547]">
                 <li>
-                  <a href="#services" className="hover:text-[#E48EAB] transition-colors py-0.5">
+                  <a href="#services" className="hover:text-[#E48EAB] transition-colors block py-2">
                     Clinical Services
                   </a>
                 </li>
                 <li>
-                  <a href="#promos" className="hover:text-[#E48EAB] transition-colors py-0.5">
+                  <a href="#promos" className="hover:text-[#E48EAB] transition-colors block py-2">
                     Special Promos
                   </a>
                 </li>
                 <li>
-                  <a href="#feedback" className="hover:text-[#E48EAB] transition-colors py-0.5">
+                  <a href="#feedback" className="hover:text-[#E48EAB] transition-colors block py-2">
                     Patient Reviews
                   </a>
                 </li>
                 <li>
-                  <a href="#about-doctor" className="hover:text-[#E48EAB] transition-colors py-0.5">
+                  <a href="#about-doctor" className="hover:text-[#E48EAB] transition-colors block py-2">
                     Doctor Profile
                   </a>
                 </li>
@@ -184,19 +184,19 @@ export function Footer() {
                 href="https://www.facebook.com/preciousmdclinic"
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
+                className="w-10 h-10 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
                 aria-label="Facebook Page"
               >
-                <FacebookIcon className="w-3.5 h-3.5" />
+                <FacebookIcon className="w-4 h-4" />
               </a>
               <a
                 href="https://www.instagram.com/preciousmddermatology"
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
+                className="w-10 h-10 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
                 aria-label="Instagram Profile"
               >
-                <InstagramIcon className="w-3.5 h-3.5" />
+                <InstagramIcon className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -204,7 +204,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left text-[11px] sm:text-xs font-light text-[#908A94]">
+        <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left text-xs font-light text-[#908A94]">
           <div suppressHydrationWarning>
             &copy; {new Date().getFullYear()} Precious MD Dermatology Clinic.
           </div>
