@@ -23,8 +23,8 @@ export const viewport = {
 
 export const metadata = {
   icons: {
-    icon: "/precious-md-rose-pink-logo.png",
-    apple: "/precious-md-rose-pink-logo.png",
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 

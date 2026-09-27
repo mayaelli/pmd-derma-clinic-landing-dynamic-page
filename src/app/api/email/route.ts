@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   try {
     const { email, patientName, subject, message } = await req.json();
@@ -16,8 +14,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, simulated: true });
     }
 
+    // Only instantiate Resend when the key is available
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const data = await resend.emails.send({
-      from: "Precious MD Clinic <onboarding@resend.dev>", // Default free testing domain
+      from: "Precious MD Clinic <onboarding@resend.dev>",
       to: [email],
       subject: subject,
       html: `
