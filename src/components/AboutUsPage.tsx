@@ -234,7 +234,8 @@ export function AboutUsPage() {
                   }
                   alt="Precious MD Doctor"
                   fill
-                  className="object-cover object-top"
+                  className="object-cover"
+                  style={{ objectPosition: "center 15%" }}
                   sizes="(max-width: 768px) 90vw, 420px"
                   priority
                 />
@@ -432,7 +433,8 @@ export function AboutUsPage() {
                             src={doctor.image_url}
                             alt={doctor.name}
                             fill
-                            className="object-cover object-top"
+                            className="object-cover"
+                            style={{ objectPosition: "center 15%" }}
                             sizes="(max-width: 1024px) 280px, 320px"
                           />
                         ) : (

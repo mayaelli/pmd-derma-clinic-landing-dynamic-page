@@ -95,8 +95,8 @@ export function BookingList() {
 
       if (error) throw error;
 
-      // 2. Dispatch Email payload to API endpoint
-      await fetch("/api/email", {
+      // 2. Dispatch Email — fire and forget, don't block on failure
+      fetch("/api/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,7 +108,7 @@ export function BookingList() {
               : "Appointment Update - Precious MD Clinic",
           message: finalMessage,
         }),
-      });
+      }).catch((err) => console.warn("Email dispatch failed (non-blocking):", err));
 
       // 3. Update local state
       setBookings((prev) =>
