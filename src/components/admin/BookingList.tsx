@@ -110,28 +110,7 @@ export function BookingList() {
         }),
       });
 
-      // 3. Dispatch to Google Calendar (Only on Confirmation)
-      if (actionType === "confirm") {
-        const calendarRes = await fetch("/api/calendar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            patientName: selectedBooking.patient_name,
-            bookingDate: selectedBooking.booking_date,
-            timeSlot: selectedBooking.time_slot,
-            email: selectedBooking.email,
-            phone: selectedBooking.phone,
-            service: "Consultation",
-          }),
-        });
-
-        if (!calendarRes.ok) {
-          const calErr = await calendarRes.json();
-          console.error("Google Calendar Push Failed:", calErr.error);
-        }
-      }
-
-      // 4. Update local state
+      // 3. Update local state
       setBookings((prev) =>
         prev.map((b) => (b.id === selectedBooking.id ? { ...b, status: newStatus } : b))
       );
