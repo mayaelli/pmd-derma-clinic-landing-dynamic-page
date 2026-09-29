@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 
     await resend.emails.send({
       from: "Precious MD Clinic <onboarding@resend.dev>",
-      to: ["slcpmaya@gmail.com"],
+      to: [process.env.CLINIC_EMAIL || "alimarhamah9@gmail.com"],
       subject: `📅 New Appointment: ${patientName} — ${bookingDate} ${timeSlot}`,
       html: `
         <div style="font-family: sans-serif; padding: 20px; color: #333D29; max-width: 520px; border: 1px solid #F2ECE4; border-radius: 12px;">
