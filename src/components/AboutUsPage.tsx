@@ -220,7 +220,7 @@ export function AboutUsPage() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 1, 0.5, 1] }}
-            className="lg:col-span-6 flex justify-center lg:justify-end"
+            className="lg:col-span-6 flex justify-center lg:justify-end pt-16 lg:pt-24"
           >
             <div className="relative w-full max-w-sm lg:max-w-md pb-8">
               {/* Decorative frame */}

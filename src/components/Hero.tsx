@@ -45,7 +45,7 @@ export function Hero({ onBookClick }: HeroProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 h-full items-stretch">
 
           {/* Left content column */}
-          <div className="lg:col-span-5 flex flex-col justify-center px-5 sm:px-14 lg:px-16 py-8 lg:py-12 lg:mt-0 z-10 bg-[#FAF8F5] relative">
+          <div className="lg:col-span-5 flex flex-col justify-center px-5 sm:px-14 lg:px-16 pt-24 pb-8 lg:py-12 lg:mt-0 z-10 bg-[#FAF8F5] relative">
 
             {/* Subtle vertical accent line */}
             <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-[#E8E2D9] to-transparent hidden lg:block" />

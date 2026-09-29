@@ -93,7 +93,10 @@ export function BookingList() {
         .update({ status: newStatus })
         .eq("id", selectedBooking.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase update error:", error);
+        throw new Error(error.message);
+      }
 
       // 2. Dispatch Email — fire and forget, don't block on failure
       fetch("/api/email", {

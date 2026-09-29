@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const timeMax = searchParams.get("timeMax");
 
   const GOOGLE_CALENDAR_ID =
-    process.env.GOOGLE_CALENDAR_ID || process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID;
+    process.env.GOOGLE_CALENDAR_ID || process.env.NEXT_GOOGLE_CALENDAR_ID;
   const API_KEY =
     process.env.GOOGLE_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
