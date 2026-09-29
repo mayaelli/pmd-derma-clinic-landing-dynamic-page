@@ -149,13 +149,13 @@ export function AboutUsPage() {
       <Header />
 
       {/* ── 1. HERO ────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-0 lg:min-h-[90vh] flex items-center overflow-hidden border-b border-[#E8E2D9] bg-[#FAF8F5]">
+      <section className="relative min-h-0 lg:min-h-[90vh] flex items-center overflow-hidden border-b border-[#E8E2D9] bg-[#FAF8F5] pt-24 md:pt-28 lg:pt-24 xl:pt-16 pb-12">
 
         {/* Subtle decorative circle */}
         <div className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full bg-[#FCE8E6]/40 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-[400px] h-[400px] rounded-full bg-[#F7F4EF]/80 blur-2xl pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-0 items-center pt-24 pb-16 lg:py-0">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-0 items-center py-4">
 
           {/* Left — headline */}
           <div className="lg:col-span-6 space-y-7">
@@ -220,7 +220,7 @@ export function AboutUsPage() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 1, 0.5, 1] }}
-            className="lg:col-span-6 flex justify-center lg:justify-end pt-16 lg:pt-24"
+            className="lg:col-span-6 flex justify-center lg:justify-end"
           >
             <div className="relative w-full max-w-sm lg:max-w-md pb-8">
               {/* Decorative frame */}

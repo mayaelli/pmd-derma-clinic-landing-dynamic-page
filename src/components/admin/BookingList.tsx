@@ -98,7 +98,23 @@ export function BookingList() {
         throw new Error(error.message);
       }
 
-      // 2. Dispatch Email — fire and forget, don't block on failure
+      // 2. Send calendar invite to slcpmaya@gmail.com on confirm — fire and forget
+      if (actionType === "confirm") {
+        fetch("/api/calendar-invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            patientName: selectedBooking.patient_name,
+            bookingDate: selectedBooking.booking_date,
+            timeSlot: selectedBooking.time_slot,
+            email: selectedBooking.email,
+            phone: selectedBooking.phone,
+            notes: selectedBooking.notes,
+          }),
+        }).catch((err) => console.warn("Calendar invite failed (non-blocking):", err));
+      }
+
+      // 3. Dispatch Email — fire and forget
       fetch("/api/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,7 +129,7 @@ export function BookingList() {
         }),
       }).catch((err) => console.warn("Email dispatch failed (non-blocking):", err));
 
-      // 3. Update local state
+      // 4. Update local state
       setBookings((prev) =>
         prev.map((b) => (b.id === selectedBooking.id ? { ...b, status: newStatus } : b))
       );
