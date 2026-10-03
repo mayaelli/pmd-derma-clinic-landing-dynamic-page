@@ -613,13 +613,15 @@ export function AboutUsPage() {
                 platform: "Facebook",
                 handle: "@PreciousMDDermatology",
                 followers: "18K+ Followers",
-                url: "https://facebook.com/PreciousMDDermatology",
-                screenshot: null, // replace with "/your-fb-screenshot.png" when ready
+                url: "https://facebook.com/preciousmdclinic",
+                screenshot: "/socials/pmd-facebook.png",
                 color: "from-[#1877F2] to-[#0d5fc7]",
                 iconBg: "bg-[#1877F2]",
                 icon: (
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  // Facebook — blue square, white f lettermark
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+                    <rect width="24" height="24" rx="4" fill="#1877F2" />
+                    <path d="M16 8h-2c-.55 0-1 .45-1 1v2h3l-.4 3H13v7h-3v-7H8v-3h2V9c0-2.21 1.79-4 4-4h2v3z" fill="white" />
                   </svg>
                 ),
               },
@@ -628,14 +630,23 @@ export function AboutUsPage() {
                 handle: "@preciousmddermatology",
                 followers: "Follow for skin tips",
                 url: "https://instagram.com/preciousmddermatology",
-                screenshot: null,
-                color: "from-[#833AB4] via-[#E1306C] to-[#F77737]",
-                iconBg: "bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737]",
+                screenshot: "/socials/pmd-instagram.png",
+                color: "from-[#F58529] via-[#DD2A7B] to-[#515BD4]",
+                iconBg: "bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#515BD4]",
                 icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="w-5 h-5 text-white">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <circle cx="12" cy="12" r="4" />
-                    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" strokeWidth={0} />
+                  // Instagram — gradient bg, white camera outline
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+                    <defs>
+                      <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#F58529" />
+                        <stop offset="50%" stopColor="#DD2A7B" />
+                        <stop offset="100%" stopColor="#515BD4" />
+                      </linearGradient>
+                    </defs>
+                    <rect width="24" height="24" rx="6" fill="url(#ig-grad)" />
+                    <rect x="4" y="4" width="16" height="16" rx="5" stroke="white" strokeWidth="1.8" fill="none" />
+                    <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="1.8" fill="none" />
+                    <circle cx="17" cy="7" r="1.2" fill="white" />
                   </svg>
                 ),
               },
@@ -643,8 +654,8 @@ export function AboutUsPage() {
                 platform: "TikTok",
                 handle: "@preciousmdclinic",
                 followers: "Derm tips & reels",
-                url: "https://tiktok.com/@preciousmdclinic",
-                screenshot: null,
+                url: "https://tiktok.com/@preciousmddermatology",
+                screenshot: "/socials/pmd-tiktok.png",
                 color: "from-[#010101] to-[#2b2b2b]",
                 iconBg: "bg-[#010101]",
                 icon: (
@@ -657,70 +668,62 @@ export function AboutUsPage() {
               <FadeUp key={social.platform} delay={i * 0.1}>
                 <div className="flex flex-col items-center gap-5">
 
-                  {/* Mock phone frame */}
-                  <div className="relative w-[200px] mx-auto">
-                    {/* Phone shell */}
-                    <div className="relative bg-[#1A1817] rounded-[2.5rem] p-2.5 shadow-2xl ring-1 ring-white/10">
-                      {/* Notch */}
-                      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-[#1A1817] rounded-full z-20 flex items-center justify-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#2C2825]" />
-                        <div className="w-6 h-1.5 rounded-full bg-[#2C2825]" />
-                      </div>
+                  {/* Mock phone frame — iPhone 16 Pro proportions */}
+                  <div className="relative w-[260px] mx-auto">
+                    {/* Phone shell — premium thin bezel */}
+                    <div className="relative bg-[#0A0A0A] rounded-[2.8rem] p-[3px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.7),0_0_0_0.5px_rgba(255,255,255,0.08)] ring-[0.5px] ring-white/8">
+                      {/* Dynamic Island */}
+                      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[4.5rem] h-[1.1rem] bg-[#0A0A0A] rounded-full z-20" />
 
                       {/* Screen */}
-                      <div className="relative rounded-[2rem] overflow-hidden bg-[#F7F4EF]" style={{ aspectRatio: "9/16" }}>
+                      <div className="relative rounded-[2.6rem] overflow-hidden bg-[#F7F4EF]" style={{ aspectRatio: "9/14" }}>
                         {social.screenshot ? (
+                          // To use: place iPhone 16 Pro screenshot (1179×2556px) in /public
+                          // then set screenshot: "/your-filename.png" above
                           <img
                             src={social.screenshot}
                             alt={`${social.platform} page`}
-                            className="w-full h-full object-cover object-top"
+                            className="w-full h-full object-contain object-top"
                           />
                         ) : (
-                          /* Placeholder screen */
                           <div className="w-full h-full flex flex-col">
-                            {/* Platform header bar */}
-                            <div className={`h-14 bg-gradient-to-r ${social.color} flex items-center px-4 gap-2.5`}>
-                              <div className={`w-7 h-7 rounded-full ${social.iconBg} flex items-center justify-center shrink-0 ring-1 ring-white/20`}>
+                            {/* Platform header */}
+                            <div className={`h-12 bg-gradient-to-r ${social.color} flex items-center px-3 gap-2`}>
+                              <div className={`w-6 h-6 rounded-full ${social.iconBg} flex items-center justify-center shrink-0`}>
                                 {social.icon}
                               </div>
                               <div>
-                                <p className="text-white text-[9px] font-bold leading-tight">{social.handle}</p>
-                                <p className="text-white/70 text-[8px]">{social.followers}</p>
+                                <p className="text-white text-[8px] font-bold leading-tight">{social.handle}</p>
+                                <p className="text-white/70 text-[7px]">{social.followers}</p>
                               </div>
                             </div>
-                            {/* Placeholder content blocks */}
-                            <div className="flex-1 p-3 space-y-2 bg-white">
-                              <div className="grid grid-cols-3 gap-1">
+                            {/* Grid placeholder */}
+                            <div className="flex-1 p-2.5 space-y-2 bg-white">
+                              <div className="grid grid-cols-3 gap-0.5">
                                 {Array.from({ length: 9 }).map((_, j) => (
-                                  <div
-                                    key={j}
-                                    className="aspect-square rounded-sm bg-[#F0EBE5]"
-                                    style={{ opacity: 1 - j * 0.06 }}
-                                  />
+                                  <div key={j} className="aspect-square rounded-sm bg-[#F0EBE5]" style={{ opacity: 1 - j * 0.06 }} />
                                 ))}
                               </div>
                               <div className="space-y-1.5 pt-1">
-                                <div className="h-2 rounded-full bg-[#F0EBE5] w-3/4" />
-                                <div className="h-2 rounded-full bg-[#F0EBE5] w-1/2" />
+                                <div className="h-1.5 rounded-full bg-[#F0EBE5] w-3/4" />
+                                <div className="h-1.5 rounded-full bg-[#F0EBE5] w-1/2" />
                               </div>
                             </div>
                           </div>
                         )}
-
-                        {/* Subtle screen glare */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-transparent pointer-events-none" />
                       </div>
 
                       {/* Home indicator */}
-                      <div className="mt-2 flex justify-center">
-                        <div className="w-20 h-1 rounded-full bg-white/20" />
+                      <div className="mt-2 flex justify-center pb-2">
+                        <div className="w-20 h-[4px] rounded-full bg-white/15" />
                       </div>
                     </div>
 
                     {/* Side buttons */}
-                    <div className="absolute -right-1.5 top-20 w-1 h-10 bg-[#2C2825] rounded-r-sm" />
-                    <div className="absolute -left-1.5 top-16 w-1 h-7 bg-[#2C2825] rounded-l-sm" />
-                    <div className="absolute -left-1.5 top-26 w-1 h-7 bg-[#2C2825] rounded-l-sm" />
+                    <div className="absolute -right-px top-20 w-[2px] h-10 bg-[#0A0A0A] rounded-r-full" />
+                    <div className="absolute -left-px top-16 w-[2px] h-8 bg-[#0A0A0A] rounded-l-full" />
+                    <div className="absolute -left-px top-[6.5rem] w-[2px] h-8 bg-[#0A0A0A] rounded-l-full" />
                   </div>
 
                   {/* Platform info below phone */}
