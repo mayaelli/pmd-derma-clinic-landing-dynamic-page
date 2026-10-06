@@ -1,4 +1,4 @@
-```markdown
+
 # 💎 Precious MD Dermatology Clinic Platform
 
 A luxury, image-driven full-stack web platform engineered and deployed independently for Precious MD Dermatology (Iligan City, Philippines). Built to deliver a seamless user experience, secure appointment bookings, and robust administrative management.
