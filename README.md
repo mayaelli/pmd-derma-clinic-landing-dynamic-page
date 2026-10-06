@@ -1,64 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```markdown
+# 💎 Precious MD Dermatology Clinic Platform
 
-## ⚠️ Security Alert - Action Required
+A luxury, image-driven full-stack web platform engineered and deployed independently for Precious MD Dermatology (Iligan City, Philippines). Built to deliver a seamless user experience, secure appointment bookings, and robust administrative management.
 
-**If you're setting up this project for the first time, please read `ACTION_REQUIRED.md` immediately.**
+![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=flat-square&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-%2338B2AC.svg?style=flat-square&logo=tailwind-css&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-%23000000.svg?style=flat-square&logo=vercel&logoColor=white)
 
-A Google API key was previously exposed in the repository. You must:
-1. Rotate the API key at Google Cloud Console
-2. Set up your environment variables properly
+---
 
-See `ACTION_REQUIRED.md` and `ROTATE_API_KEY.md` for detailed instructions.
+## ✨ Key Features & Architecture
 
-## Getting Started
+* **Modern Full-Stack Architecture:** Independently engineered using **Next.js 14+ (App Router** utilizing both Server and Client Components) for optimal server-side rendering, SEO performance, and dynamic routing.
+* **Database Security & Access Control:** Built on **Supabase (PostgreSQL)**, enforcing strict **Row-Level Security (RLS)** policies and multi-tier user role-mapping (`admin`, `editor`, `receptionist`) via `@supabase/ssr`.
+* **Automated Transactional Messaging:** Integrated **Resend API** for automated email notifications and booking confirmations synchronized through a structured state machine ledger.
+* **Dynamic UI & Asset Management:** Developed smooth, fluid client-side animations with **Framer Motion** and **Lucide React**, paired with high-performance image and media storage managed via Supabase Storage buckets.
+* **Automated CI/CD Pipeline:** Maintained continuous integration and lightning-fast edge deployments via GitHub and Vercel.
 
-### 1. Set Up Environment Variables
+---
 
-Copy the example environment file:
+## 🛠️ Tech Stack
 
-```bash
-cp .env.example .env.local
+* **Frontend:** Next.js, TypeScript, Tailwind CSS, Framer Motion, Lucide React
+* **Backend & Database:** Supabase (PostgreSQL, RLS, Storage, Auth via `@supabase/ssr`)
+* **API & Integrations:** Resend API (Transactional Emails)
+* **DevOps & Tooling:** Git, GitHub, Vercel CI/CD
+
+---
+
+## 🚀 Getting Started Locally
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/mayaelli/pmd-derma-clinic-lending-dynamic-page.git](https://github.com/mayaelli/pmd-derma-clinic-lending-dynamic-page.git)
+   cd pmd-derma-clinic-lending-dynamic-page
+
 ```
 
-Then edit `.env.local` and fill in your actual values. **Never commit this file to Git.**
-
-See `SECURITY.md` for best practices and `ROTATE_API_KEY.md` for Google API key setup.
-
-### 2. Install Dependencies
-
+2. **Install dependencies:**
 ```bash
 npm install
+
 ```
 
-### 3. Run the Development Server
 
+3. **Set up environment variables:**
+Create a `.env.local` file in the root directory and add your Supabase and Resend keys:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+RESEND_API_KEY=your_resend_api_key
+
+```
+
+
+4. **Run the development server:**
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
+
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👩‍💻 Author
 
-## Learn More
+**Marhamah S. Ali**
 
-To learn more about Next.js, take a look at the following resources:
+*Full-Stack Developer | Summa Cum Laude IT Graduate*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* Portfolio: [https://marhamah-ali.netlify.app/](https://marhamah-ali.netlify.app/)
+* GitHub: [@mayaelli](https://www.google.com/search?q=https://github.com/mayaelli)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
