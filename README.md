@@ -76,6 +76,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 * Portfolio: [https://marhamah-ali.netlify.app/](https://marhamah-ali.netlify.app/)
 * GitHub: [@mayaelli](https://www.google.com/search?q=https://github.com/mayaelli)
 
-```
 
-```
