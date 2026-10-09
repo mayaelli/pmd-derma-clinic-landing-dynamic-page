@@ -62,11 +62,11 @@ export function TestimonialsSection() {
   const canNext = currentIndex < reviews.length - VISIBLE;
 
   return (
-    <section id="feedback" className="scroll-mt-20 py-16 px-4 bg-[#1A1817] border-t border-white/5">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <section id="feedback" className="scroll-mt-20 py-12 sm:py-14 md:py-16 px-5 sm:px-6 md:px-8 bg-[#1A1817] border-t border-white/5">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-7 md:space-y-8">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 border-b border-white/10 pb-5 sm:pb-6">
           <div className="space-y-2">
             <span className="text-xs font-semibold tracking-wider text-[#C87D87] uppercase">
               Patient Experiences
@@ -108,18 +108,18 @@ export function TestimonialsSection() {
 
         {/* Carousel */}
         {!loading && reviews.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Strip */}
             <div
               ref={stripRef}
               onScroll={handleScroll}
-              className="flex gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory"
+              className="flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory"
               style={{ scrollbarWidth: "none" }}
             >
               {reviews.map((rev) => (
                 <div
                   key={rev.id}
-                  className="shrink-0 snap-start w-[calc(100%-2rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] bg-white/5 border border-white/10 hover:border-[#C87D87]/40 rounded-2xl p-6 flex flex-col justify-between space-y-4 transition-all"
+                  className="shrink-0 snap-start w-[calc(100%-2rem)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] bg-white/5 border border-white/10 hover:border-[#C87D87]/40 rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-3 sm:space-y-4 transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">

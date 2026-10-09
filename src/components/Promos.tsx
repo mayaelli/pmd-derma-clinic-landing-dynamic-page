@@ -112,9 +112,9 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
   return (
     <section
       id="promos"
-      className="scroll-mt-20 bg-[#FAF8F5] py-12 md:py-20 border-b border-[#E8E2D9] relative overflow-hidden"
+      className="scroll-mt-20 bg-[#FAF8F5] py-10 sm:py-12 md:py-16 lg:py-20 border-b border-[#E8E2D9] relative overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-8">
         {!hasData ? (
           <div className="py-16 flex flex-col items-center justify-center text-center gap-3 bg-white rounded-3xl border border-[#E8E2D9] shadow-xs">
             <div className="w-12 h-12 rounded-2xl bg-[#F7F4EF] border border-[#E3DCD3] flex items-center justify-center">
@@ -126,13 +126,14 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
             </p>
           </div>
         ) : (
-          /* ── 3-Column Louvre Layout Split ───────────────────────────────── */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch lg:max-h-[85vh] lg:min-h-[420px]">
+          /* ── Responsive Layout: Mobile-first, 3-column on desktop ───────────────────────────────── */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 lg:max-h-[85vh] lg:min-h-[420px]">
 
-            {/* COLUMN 1: Title, Dynamic Inclusions List, and Action Button (~35% Width) */}
-            <div className="lg:col-span-4 flex flex-col justify-between space-y-6 py-1">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 bg-white border border-[#E8E2D9] text-[#1A1817] px-3.5 py-1 rounded-full text-xs font-semibold shadow-2xs">
+            {/* COLUMN 1: Title, Dynamic Inclusions List, and Action Button - ORDER 2 on mobile, 1 on desktop */}
+            <div className="order-2 lg:order-1 lg:col-span-4 flex flex-col justify-between space-y-5 sm:space-y-6 py-1">
+              <div className="space-y-4 sm:space-y-5">
+                {/* Badge - visible on desktop, hidden on mobile (shows on image instead) */}
+                <div className="hidden lg:inline-flex items-center gap-2 bg-white border border-[#E8E2D9] text-[#1A1817] px-3.5 py-1 rounded-full text-xs font-semibold shadow-2xs">
                   <Tag className="w-3.5 h-3.5 text-[#C87D87]" />
                   <span>Exclusive Clinical Package</span>
                 </div>
@@ -146,7 +147,7 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
                     transition={{ duration: 0.3 }}
                     className="space-y-3"
                   >
-                    <h2 className="font-serif text-2xl sm:text-3xl md:text-3xl font-bold text-[#1A1817] tracking-tight leading-snug">
+                    <h2 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-[#1A1817] tracking-tight leading-snug">
                       {currentPromo.title}
                     </h2>
 
@@ -158,7 +159,7 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
 
                     {/* Redesigned Item Listing */}
                     {currentPromo.items.length > 0 && (
-                      <div className="mt-4 space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-[#E8E2D9]">
+                      <div className="mt-4 space-y-2 max-h-[280px] sm:max-h-[320px] lg:max-h-[220px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-[#E8E2D9]">
                         {currentPromo.items.map((item, idx) => (
                           <div
                             key={idx}
@@ -198,10 +199,10 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
                 </AnimatePresence>
               </div>
 
-              <div>
+              <div className="pt-2">
                 <button
                   onClick={() => onBookClick?.()}
-                  className="inline-flex items-center justify-center gap-2 bg-[#C87D87] hover:bg-[#b8707a] text-white text-xs font-semibold px-6 py-3.5 rounded-full shadow-md shadow-[#C87D87]/20 transition-all cursor-pointer active:scale-95 group w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 bg-[#C87D87] hover:bg-[#b8707a] text-white text-sm font-semibold px-6 py-3.5 rounded-full shadow-md shadow-[#C87D87]/20 transition-all cursor-pointer active:scale-95 group w-full"
                 >
                   <span>Book This Package</span>
                   <ArrowUpRight className="w-4 h-4 text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -209,8 +210,14 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
               </div>
             </div>
 
-            {/* COLUMN 2: Featured Media Poster Card (~40% Width) */}
-            <div className="lg:col-span-5 relative">
+            {/* COLUMN 2: Featured Media Poster Card - ORDER 1 on mobile (top), 2 on desktop */}
+            <div className="order-1 lg:order-2 lg:col-span-5 relative mb-6 lg:mb-0">
+              {/* Badge - ONLY on mobile/tablet, positioned ABOVE image */}
+              <div className="lg:hidden mb-3 inline-flex items-center gap-2 bg-white border border-[#E8E2D9] text-[#1A1817] px-3.5 py-1 rounded-full text-xs font-semibold shadow-2xs">
+                <Tag className="w-3.5 h-3.5 text-[#C87D87]" />
+                <span>Exclusive Clinical Package</span>
+              </div>
+
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={currentPromo.id}
@@ -219,7 +226,7 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  className="relative h-full min-h-[280px] sm:min-h-[360px] md:min-h-[420px] rounded-3xl overflow-hidden border border-[#E8E2D9] group shadow-xs bg-[#F7F4EF] flex flex-col justify-between p-5"
+                  className="relative h-full min-h-[320px] sm:min-h-[380px] md:min-h-[420px] rounded-3xl overflow-hidden border border-[#E8E2D9] group shadow-xs bg-[#F7F4EF] p-5"
                 >
                   <Image
                     src={currentPromo.pubmatImage || "/precious-md-promo.jpg"}
@@ -233,7 +240,7 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/30 pointer-events-none" />
 
-                  {/* Top Badges */}
+                  {/* Top Badges - only Featured and Validity on mobile */}
                   <div className="relative z-10 flex items-center justify-between">
                     <span className="bg-white/90 backdrop-blur-md text-[#1A1817] text-[11px] font-bold px-3 py-1 rounded-full shadow-xs">
                       {currentPromo.badge || "Featured Deal"}
@@ -247,8 +254,8 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
                     )}
                   </div>
 
-                  {/* Bottom Text Overlay & Expand Trigger */}
-                  <div className="relative z-10 flex items-end justify-between gap-4 mt-auto">
+                  {/* Bottom Text Overlay & Expand Trigger - DESKTOP ONLY */}
+                  <div className="hidden lg:flex absolute bottom-5 left-5 right-5 z-10 items-end justify-between gap-4">
                     <div className="space-y-1 text-white max-w-[80%]">
                       <p className="font-serif text-lg sm:text-xl font-medium leading-snug drop-shadow-xs">
                         {currentPromo.title}
@@ -268,12 +275,23 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
                       <ArrowUpRight className="w-5 h-5" />
                     </button>
                   </div>
+
+                  {/* Expand button ONLY - visible on mobile, positioned at bottom-right */}
+                  <button
+                    onClick={() =>
+                      setLightboxImage(currentPromo.pubmatImage || "/precious-md-promo.jpg")
+                    }
+                    className="lg:hidden absolute bottom-5 right-5 z-10 w-11 h-11 rounded-full bg-white/20 hover:bg-white text-white hover:text-[#1A1817] border border-white/40 backdrop-blur-md flex items-center justify-center shadow-lg transition-all active:scale-95 cursor-pointer"
+                    aria-label="Expand image"
+                  >
+                    <ArrowUpRight className="w-5 h-5" />
+                  </button>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* COLUMN 3: Unified Warm Palette Card & Navigation (~25% Width) */}
-            <div className="lg:col-span-3 flex flex-col justify-between space-y-4">
+            {/* COLUMN 3: Unified Warm Palette Card & Navigation - ORDER 3 on mobile (bottom), 3 on desktop */}
+            <div className="order-3 lg:col-span-3 flex flex-col justify-between space-y-3 sm:space-y-4">
 
               {/* Inclusions & Highlights Card */}
               <AnimatePresence mode="wait">
@@ -358,36 +376,58 @@ export function Promos({ promos = [], onBookClick }: PromosProps) {
       {/* ── Lightbox Modal ──────────────────────────────────────────────── */}
       <AnimatePresence>
         {lightboxImage && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-md"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/95"
             onClick={() => setLightboxImage(null)}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-w-3xl w-full max-h-[85vh] flex flex-col items-center justify-center"
+            {/* Close button - fixed position */}
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 rounded-full bg-white/95 hover:bg-white text-[#1A1817] shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              aria-label="Close poster"
             >
-              <button
-                onClick={() => setLightboxImage(null)}
-                className="absolute -top-12 right-0 md:-top-4 md:-right-4 z-10 w-9 h-9 rounded-full bg-white text-[#1A1817] shadow-2xl flex items-center justify-center hover:scale-105 transition-transform cursor-pointer border border-[#E8E2D9]"
-                aria-label="Close poster"
-              >
-                <X className="w-4 h-4 text-[#1A1817]" />
-              </button>
-              <div className="relative w-full h-[80vh] flex items-center justify-center">
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Image container - optimized for portrait posters */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="h-full w-full flex items-center justify-center p-4 sm:p-8 md:p-12"
+            >
+              {/* Actual image wrapper with max constraints */}
+              <div className="relative w-full h-full max-w-xl max-h-full">
                 <Image
                   src={lightboxImage}
                   alt="Promo Poster"
                   fill
-                  sizes="(max-width: 768px) 100vw, 800px"
-                  className="object-contain rounded-2xl"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 600px, 800px"
+                  className="object-contain"
                   priority
+                  quality={100}
+                  style={{
+                    filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5))'
+                  }}
                 />
               </div>
             </motion.div>
-          </div>
+
+            {/* Tap hint - bottom center */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md text-white text-xs font-medium px-4 py-2.5 rounded-full border border-white/20 pointer-events-none"
+            >
+              Tap anywhere to close
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </section>

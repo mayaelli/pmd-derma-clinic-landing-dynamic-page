@@ -17,9 +17,9 @@ export default function HomeBento({ bentoCards, onSelectService }: HomeBentoProp
   });
 
   return (
-    <section className="bg-white py-10 sm:py-12 border-b border-[#E3DCD3]">
+    <section className="bg-white py-10 sm:py-12 md:py-14 border-b border-[#E3DCD3]">
       {/* Max-width container with generous outer margins */}
-      <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 space-y-8 sm:space-y-10">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-10 lg:px-16 space-y-6 sm:space-y-8 md:space-y-10">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#E3DCD3] pb-4 gap-2">
@@ -38,31 +38,31 @@ export default function HomeBento({ bentoCards, onSelectService }: HomeBentoProp
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 sm:gap-4 md:gap-5">
           {/* --- TOP SECTION --- */}
           {/* Slot 1: Top Left */}
-          <BentoTile data={slots[1]} className="md:col-span-3 h-64 sm:h-72 lg:h-80" />
+          <BentoTile data={slots[1]} className="md:col-span-3 h-64 sm:h-64 md:h-72 lg:h-80" />
 
           {/* Slot 2: Top Middle */}
-          <BentoTile data={slots[2]} className="md:col-span-3 h-64 sm:h-72 lg:h-80" />
+          <BentoTile data={slots[2]} className="md:col-span-3 h-64 sm:h-64 md:h-72 lg:h-80" />
 
           {/* Right Column Stack (Wide Horizontals) */}
-          <div className="md:col-span-6 grid grid-cols-1 gap-4 sm:gap-5">
+          <div className="md:col-span-6 grid grid-cols-1 gap-3 sm:gap-4 md:gap-5">
             {/* Slot 3: Top Right Wide */}
-            <BentoTile data={slots[3]} className="h-36 sm:h-40 lg:h-40" />
+            <BentoTile data={slots[3]} className="h-36 sm:h-36 md:h-40 lg:h-40" />
             {/* Slot 4: Middle Right Wide */}
-            <BentoTile data={slots[4]} className="h-36 sm:h-40 lg:h-40" />
+            <BentoTile data={slots[4]} className="h-36 sm:h-36 md:h-40 lg:h-40" />
           </div>
 
           {/* --- BOTTOM SECTION --- */}
           {/* Slot 5: Bottom Left */}
-          <BentoTile data={slots[5]} className="md:col-span-4 h-52 sm:h-56" />
+          <BentoTile data={slots[5]} className="md:col-span-4 h-52 sm:h-52 md:h-56" />
 
           {/* Slot 6: Bottom Middle */}
-          <BentoTile data={slots[6]} className="md:col-span-4 h-52 sm:h-56" />
+          <BentoTile data={slots[6]} className="md:col-span-4 h-52 sm:h-52 md:h-56" />
 
           {/* Slot 7: Bottom Right CTA (View All) */}
-          <ViewAllTile className="md:col-span-4 h-52 sm:h-56" />
+          <ViewAllTile className="md:col-span-4 h-52 sm:h-52 md:h-56" />
         </div>
       </div>
     </section>

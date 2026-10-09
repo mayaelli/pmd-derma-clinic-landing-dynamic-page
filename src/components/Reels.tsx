@@ -89,12 +89,12 @@ export function Reels({ reels = [] }: ReelsProps) {
   return (
     <section
       id="reels"
-      className="scroll-mt-20 bg-[#F0EBE5] py-10 md:py-14 border-b border-[#E8E2D9] overflow-hidden"
+      className="scroll-mt-20 bg-[#F0EBE5] py-10 sm:py-12 md:py-14 border-b border-[#E8E2D9] overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-8">
 
         {/* ── Section header ────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#E3DCD3] pb-4 gap-2 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#E3DCD3] pb-3 sm:pb-4 gap-2 mb-6 sm:mb-7 md:mb-8">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 text-[#A6626A] text-[10px] font-mono tracking-widest uppercase">
               <Film className="w-3 h-3 text-[#C87D87]" />

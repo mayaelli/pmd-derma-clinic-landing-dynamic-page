@@ -84,8 +84,8 @@ export function Header({ onBookClick }: HeaderProps) {
             : "bg-[#C88F9A]"
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-[4.5rem]">
 
             {/* Logo */}
             <a
@@ -99,12 +99,12 @@ export function Header({ onBookClick }: HeaderProps) {
                 width={140}
                 height={42}
                 priority
-                className="w-auto h-8 sm:h-9 object-contain transition-opacity duration-200 group-hover:opacity-80"
+                className="w-auto h-9 md:h-10 object-contain transition-opacity duration-200 group-hover:opacity-80"
               />
             </a>
 
             {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
+            <nav className="hidden md:flex items-center gap-4 lg:gap-7 xl:gap-9">
               {navItems.map((item) => {
                 const isActive = activeNav === item.name;
                 return (
@@ -112,7 +112,7 @@ export function Header({ onBookClick }: HeaderProps) {
                     key={item.name}
                     href={item.href}
                     onClick={(e) => handleNavigation(e, item)}
-                    className={`relative text-white text-[13px] tracking-wide transition-all duration-200 cursor-pointer group ${isActive ? "font-semibold" : "font-normal opacity-85 hover:opacity-100"
+                    className={`relative text-white text-[13px] md:text-sm tracking-wide transition-all duration-200 cursor-pointer group ${isActive ? "font-semibold" : "font-normal opacity-85 hover:opacity-100"
                       }`}
                   >
                     {item.name}
@@ -126,13 +126,13 @@ export function Header({ onBookClick }: HeaderProps) {
             </nav>
 
             {/* Right: Book Now button */}
-            <div className="hidden lg:flex items-center">
+            <div className="hidden md:flex items-center">
               <button
                 type="button"
                 onClick={() => onBookClick?.()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#C88F9A] hover:bg-[#FAF8F5] text-xs font-semibold rounded-full transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 md:px-5 py-2 bg-white text-[#C88F9A] hover:bg-[#FAF8F5] text-xs md:text-sm font-semibold rounded-full transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
               >
-                <Calendar className="w-3.5 h-3.5" />
+                <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 Book Now
               </button>
             </div>
@@ -141,7 +141,7 @@ export function Header({ onBookClick }: HeaderProps) {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -158,9 +158,9 @@ export function Header({ onBookClick }: HeaderProps) {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="lg:hidden bg-[#C88F9A]/95 backdrop-blur-md border-t border-white/20 overflow-hidden"
+            className="md:hidden bg-[#C88F9A]/95 backdrop-blur-md border-t border-white/20 overflow-hidden"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-1">
+            <div className="max-w-7xl mx-auto px-5 sm:px-6 py-4 space-y-1">
               {navItems.map((item) => {
                 const isActive = activeNav === item.name;
                 return (

@@ -162,7 +162,7 @@ export default function ServicesClient({ categories }: ServicesClientProps) {
         />
 
         {/* ── CATEGORY SECTIONS ─────────────────────────────────────────────── */}
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-12 sm:pb-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-12 sm:pb-16">
           {/* Search bar — tight to the hero bottom */}
           <div className="relative max-w-sm mb-5 sm:mb-8">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#B0A9A2]" />

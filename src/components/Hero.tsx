@@ -39,16 +39,18 @@ export function Hero({ onBookClick }: HeroProps) {
   return (
     <section
       id="hero"
-      className="bg-[#FAF8F5] border-b border-[#E8E2D9] h-screen flex items-center overflow-hidden"
+      className="bg-[#FAF8F5] border-b border-[#E8E2D9] overflow-hidden pt-14 md:pt-16"
     >
-      <div className="w-full h-full max-w-[1920px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 h-full items-stretch">
+      {/* Fluid container with progressive heights */}
+      <div className="w-full max-w-[1920px] mx-auto">
+        {/* Grid: stacked on mobile/small tablet, side-by-side on tablet landscape+ */}
+        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[600px] sm:min-h-[650px] md:min-h-[700px] lg:min-h-[750px] xl:min-h-screen">
 
-          {/* Left content column */}
-          <div className="lg:col-span-5 flex flex-col justify-center px-5 sm:px-14 lg:px-16 pt-24 pb-8 lg:py-12 lg:mt-0 z-10 bg-[#FAF8F5] relative">
+          {/* Left content column - 40% on tablet+ */}
+          <div className="md:col-span-5 flex flex-col justify-center px-6 sm:px-8 md:px-10 lg:px-14 xl:px-16 py-20 sm:py-24 md:py-12 lg:py-12 bg-[#FAF8F5] relative">
 
             {/* Subtle vertical accent line */}
-            <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-[#E8E2D9] to-transparent hidden lg:block" />
+            <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-[#E8E2D9] to-transparent hidden md:block" />
 
             <motion.div
               initial="hidden"
@@ -60,14 +62,14 @@ export function Hero({ onBookClick }: HeroProps) {
                   transition: { staggerChildren: 0.12, delayChildren: 0.1 },
                 },
               }}
-              className="space-y-6 max-w-lg"
+              className="space-y-4 sm:space-y-5 md:space-y-6 max-w-lg"
             >
               {/* Eyebrow — location + credential */}
               <motion.div
                 variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
                 className="flex items-center gap-2.5"
               >
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white border border-[#E8E2D9] rounded-full shadow-xs">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-3.5 bg-white border border-[#E8E2D9] rounded-full shadow-xs">
                   <svg className="w-3.5 h-3.5 text-[#C87D87] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
@@ -104,7 +106,7 @@ export function Hero({ onBookClick }: HeroProps) {
               {/* One-line description */}
               <motion.p
                 variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-                className="text-sm sm:text-[15px] font-light text-[#706A63] leading-relaxed"
+                className="text-sm sm:text-base font-light text-[#706A63] leading-relaxed"
               >
                 Expert clinical dermatology and aesthetic care — from acne protocols
                 to skin rejuvenation — tailored for every patient.
@@ -117,7 +119,7 @@ export function Hero({ onBookClick }: HeroProps) {
               >
                 <button
                   onClick={onBookClick}
-                  className="inline-flex items-center gap-2 bg-[#C88F9A] hover:bg-[#b67d8c] text-white text-sm font-semibold px-6 py-3.5 rounded-full transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer"
+                  className="inline-flex items-center gap-2 bg-[#C88F9A] hover:bg-[#b67d8c] text-white text-sm font-semibold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer"
                 >
                   <Calendar className="w-4 h-4" />
                   Book a Consultation
@@ -125,7 +127,7 @@ export function Hero({ onBookClick }: HeroProps) {
 
                 <a
                   href={`tel:${clinicConfig.phone}`}
-                  className="inline-flex items-center gap-2 bg-white hover:bg-[#F7F4EF] text-[#2B2625] border border-[#E8E2D9] text-sm font-medium px-6 py-3.5 rounded-full transition-all duration-300 shadow-xs hover:shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-2 bg-white hover:bg-[#F7F4EF] text-[#2B2625] border border-[#E8E2D9] text-sm font-medium px-5 sm:px-6 py-3 sm:py-3.5 rounded-full transition-all duration-300 shadow-xs hover:shadow-sm cursor-pointer"
                 >
                   <Phone className="w-4 h-4 text-[#C87D87]" />
                   {clinicConfig.phone}
@@ -155,8 +157,8 @@ export function Hero({ onBookClick }: HeroProps) {
             </motion.div>
           </div>
 
-          {/* 60% Width Image Slideshow Container */}
-          <div className="lg:col-span-7 relative h-[300px] sm:h-[400px] lg:h-full w-full bg-[#F0ECE6] overflow-hidden">
+          {/* Right image column - 60% on tablet+ */}
+          <div className="md:col-span-7 relative min-h-[500px] sm:min-h-[550px] md:min-h-full w-full bg-[#F0ECE6] overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentImageIndex}
@@ -171,16 +173,16 @@ export function Hero({ onBookClick }: HeroProps) {
                   alt={HERO_IMAGES[currentImageIndex].alt}
                   fill
                   priority
-                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  sizes="(max-width: 768px) 100vw, 58vw"
                   className="object-cover object-center"
                 />
                 {/* Soft gradient edge overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#FAF8F5]/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-[#FAF8F5] lg:via-transparent lg:to-transparent lg:w-32" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FAF8F5]/40 via-transparent to-transparent md:bg-gradient-to-r md:from-[#FAF8F5] md:via-transparent md:to-transparent md:w-32" />
               </motion.div>
             </AnimatePresence>
 
             {/* Slide Pagination Overlay */}
-            <div className="absolute bottom-8 right-8 lg:bottom-12 lg:right-12 z-20 flex items-center gap-3 bg-[#FAF8F5]/80 backdrop-blur-md px-4 py-2 border border-[#E8E2D9]">
+            <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 lg:bottom-12 lg:right-12 z-20 flex items-center gap-3 bg-[#FAF8F5]/80 backdrop-blur-md px-4 py-2 border border-[#E8E2D9]">
               {HERO_IMAGES.map((_, index) => (
                 <button
                   key={index}

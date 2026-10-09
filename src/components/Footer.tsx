@@ -74,11 +74,13 @@ export function Footer() {
       <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#E3E4E8]/30 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-6 gap-y-7 pb-8 border-b border-[#E8D5CC]/60">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-8 py-6 sm:pt-8 md:pt-10 sm:pb-6 relative z-10">
+        
+        {/* Mobile: Single Column, Desktop: Grid */}
+        <div className="space-y-5 md:space-y-0 md:grid md:grid-cols-12 md:gap-x-6 pb-5 sm:pb-7 md:pb-8 border-b border-[#E8D5CC]/60">
 
-          {/* Column 1: Brand & Quote Card */}
-          <div className="md:col-span-5 lg:col-span-4 space-y-3">
+          {/* Column 1: Brand & Quote */}
+          <div className="md:col-span-12 lg:col-span-5 space-y-2.5">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#E48EAB] shrink-0" />
               <span className="font-serif text-base sm:text-lg font-bold text-[#333D29] tracking-tight leading-none">
@@ -87,7 +89,7 @@ export function Footer() {
             </div>
 
             {/* Quote Card */}
-            <div className="p-3 rounded-xl bg-white/60 border border-[#E8D5CC]/70 space-y-1 max-w-sm shadow-xs">
+            <div className="p-3 rounded-xl bg-white/60 border border-[#E8D5CC]/70 space-y-1 shadow-xs">
               <p className="font-serif italic text-xs text-[#6B5B52] leading-snug">
                 &ldquo;Healthy skin is a reflection of overall wellness, cared for with science and intent.&rdquo;
               </p>
@@ -97,32 +99,32 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Clinical Info Grid */}
-          <div className="md:col-span-7 lg:col-span-5 grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-6">
-
+          {/* Column 2: Two-column grid for Explore + Hours */}
+          <div className="md:col-span-12 lg:col-span-4 grid grid-cols-2 gap-5">
+            
             {/* Quick Links */}
-            <div className="space-y-2.5 lg:col-span-5">
+            <div className="space-y-2">
               <h4 className="font-serif text-xs font-bold text-[#333D29] tracking-wider uppercase">
                 Explore
               </h4>
-              <ul className="space-y-0.5 text-xs font-light text-[#4A4547]">
+              <ul className="space-y-1 text-xs font-light text-[#4A4547]">
                 <li>
-                  <a href="#services" className="hover:text-[#E48EAB] transition-colors block py-2">
+                  <a href="#services" className="hover:text-[#E48EAB] transition-colors block py-0.5">
                     Clinical Services
                   </a>
                 </li>
                 <li>
-                  <a href="#promos" className="hover:text-[#E48EAB] transition-colors block py-2">
+                  <a href="#promos" className="hover:text-[#E48EAB] transition-colors block py-0.5">
                     Special Promos
                   </a>
                 </li>
                 <li>
-                  <a href="#feedback" className="hover:text-[#E48EAB] transition-colors block py-2">
+                  <a href="#feedback" className="hover:text-[#E48EAB] transition-colors block py-0.5">
                     Patient Reviews
                   </a>
                 </li>
                 <li>
-                  <a href="#about-doctor" className="hover:text-[#E48EAB] transition-colors block py-2">
+                  <a href="#about-doctor" className="hover:text-[#E48EAB] transition-colors block py-0.5">
                     Doctor Profile
                   </a>
                 </li>
@@ -130,25 +132,25 @@ export function Footer() {
             </div>
 
             {/* Clinic Hours */}
-            <div className="space-y-2.5 lg:col-span-7">
+            <div className="space-y-2">
               <h4 className="font-serif text-xs font-bold text-[#333D29] tracking-wider uppercase">
                 Clinic Hours
               </h4>
-              <div className="space-y-2.5 text-xs font-light text-[#4A4547]">
-                <div className="flex items-start gap-2">
+              <div className="space-y-2 text-xs font-light text-[#4A4547]">
+                <div className="flex items-start gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-[#E48EAB] shrink-0 mt-0.5" />
                   <div>
-                    <div className="font-semibold text-[#333D29] leading-none">Mon – Sat</div>
-                    <div className="text-[11px] text-[#908A94] mt-0.5">9:00 AM – 5:00 PM</div>
+                    <div className="font-semibold text-[#333D29] leading-tight">Mon – Sat</div>
+                    <div className="text-[10px] text-[#908A94] mt-0.5">9:00 AM – 5:00 PM</div>
                   </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <span className="w-3.5 h-3.5 rounded-full bg-[#E48EAB]/15 text-[#E48EAB] text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#E48EAB]/15 text-[#E48EAB] text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     !
                   </span>
                   <div>
-                    <div className="font-semibold text-[#333D29] leading-none">Sun &amp; Holidays</div>
-                    <div className="text-[11px] text-[#908A94] mt-0.5">Prior Appointment Only</div>
+                    <div className="font-semibold text-[#333D29] leading-tight">Sun &amp; Holidays</div>
+                    <div className="text-[10px] text-[#908A94] mt-0.5">By Appointment</div>
                   </div>
                 </div>
               </div>
@@ -157,12 +159,12 @@ export function Footer() {
           </div>
 
           {/* Column 3: Contact & Social */}
-          <div className="md:col-span-12 lg:col-span-3 space-y-3.5 lg:border-l lg:border-[#E8D5CC]/60 lg:pl-6 pt-6 md:pt-0">
+          <div className="md:col-span-12 lg:col-span-3 space-y-2.5 lg:border-l lg:border-[#E8D5CC]/60 lg:pl-6">
             <h4 className="font-serif text-xs font-bold text-[#333D29] tracking-wider uppercase">
               Location &amp; Connect
             </h4>
 
-            <ul className="space-y-2.5 text-xs font-light text-[#4A4547]">
+            <ul className="space-y-2 text-xs font-light text-[#4A4547]">
               <li className="flex items-start gap-2">
                 <MapPin className="w-3.5 h-3.5 text-[#E48EAB] shrink-0 mt-0.5" />
                 <span className="leading-snug">JGC Bldg, Corner Lluch St., Iligan</span>
@@ -171,7 +173,7 @@ export function Footer() {
                 <Mail className="w-3.5 h-3.5 text-[#E48EAB] shrink-0" />
                 <a
                   href="mailto:preciousmdclinic@gmail.com"
-                  className="hover:text-[#E48EAB] transition-colors py-0.5"
+                  className="hover:text-[#E48EAB] transition-colors truncate"
                 >
                   preciousmdclinic@gmail.com
                 </a>
@@ -179,12 +181,12 @@ export function Footer() {
             </ul>
 
             {/* Social Links */}
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2.5 pt-1">
               <a
                 href="https://www.facebook.com/preciousmdclinic"
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
+                className="w-9 h-9 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
                 aria-label="Facebook Page"
               >
                 <FacebookIcon className="w-4 h-4" />
@@ -193,7 +195,7 @@ export function Footer() {
                 href="https://www.instagram.com/preciousmddermatology"
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
+                className="w-9 h-9 rounded-full bg-white/70 border border-[#E8D5CC]/80 hover:bg-[#CD9581] text-[#4A4547] hover:text-white flex items-center justify-center transition-all shadow-xs"
                 aria-label="Instagram Profile"
               >
                 <InstagramIcon className="w-4 h-4" />
@@ -204,13 +206,13 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left text-xs font-light text-[#908A94]">
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left text-[11px] font-light text-[#908A94]">
           <div suppressHydrationWarning>
             &copy; {new Date().getFullYear()} Precious MD Dermatology Clinic.
           </div>
           <div className="flex items-center gap-1.5">
-            <span>Crafted with care for healthier skin</span>
-            <Heart className="w-3.5 h-3.5 text-[#E48EAB] fill-[#E48EAB]" />
+            <span>Crafted with care</span>
+            <Heart className="w-3 h-3 text-[#E48EAB] fill-[#E48EAB]" />
           </div>
         </div>
 
