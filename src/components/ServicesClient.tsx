@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { SafeImage } from "@/components/SafeImage";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import BookingModal from "@/components/BookingModal";
@@ -530,7 +530,7 @@ function SubcategoryCard({
               transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="absolute inset-0"
             >
-              <Image
+              <SafeImage
                 src={subcategory.imageUrl}
                 alt={subcategory.title}
                 fill
@@ -670,7 +670,7 @@ function SheetContent({
       <div className="relative w-full aspect-[16/9] shrink-0 bg-[#1A1817]">
         {allImages.length > 0 ? (
           <>
-            <Image
+            <SafeImage
               src={allImages[imgIdx]}
               alt={subcategory.title}
               fill
