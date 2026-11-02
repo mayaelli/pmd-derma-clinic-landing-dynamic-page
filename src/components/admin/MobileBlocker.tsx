@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Monitor, Tablet, Smartphone, AlertCircle } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function MobileBlocker({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -129,12 +130,12 @@ export function MobileBlocker({ children }: { children: React.ReactNode }) {
               </div>
 
               {/* Action Button (Optional - can link to main site) */}
-              <a
+              <Link
                 href="/"
                 className="block w-full px-4 py-2.5 bg-[#CD9581] hover:bg-[#B8846F] text-white text-xs font-semibold rounded-xl text-center transition-all shadow-sm"
               >
                 Return to Main Website
-              </a>
+              </Link>
 
             </div>
           </div>

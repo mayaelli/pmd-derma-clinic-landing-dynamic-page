@@ -17,6 +17,8 @@ import {
   ChevronRight,
   ChevronLeft,
   ChevronDown,
+  Expand,
+  Minimize,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -125,15 +127,22 @@ export default function ServicesClient({ categories }: ServicesClientProps) {
   useEffect(() => {
     if (activeSheet) {
       const scrollY = window.scrollY;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
+      document.body.style.paddingRight = `${scrollbarWidth}px`; // Prevent layout shift
     } else {
       const savedTop = document.body.style.top;
+      const scrollY = savedTop ? parseInt(savedTop) * -1 : 0;
+      
       document.body.style.position = "";
       document.body.style.top = "";
       document.body.style.width = "";
-      if (savedTop) window.scrollTo({ top: parseInt(savedTop) * -1, behavior: "instant" });
+      document.body.style.paddingRight = "";
+      
+      window.scrollTo({ top: scrollY, behavior: "instant" });
     }
   }, [activeSheet]);
 
@@ -412,6 +421,20 @@ function CategorySection({
   const hasMore = category.subcategories.length > INITIAL_VISIBLE;
   const [expanded, setExpanded] = useState(false);
 
+  // Sort subcategories: those WITH images first, then those WITHOUT
+  const sortedSubcategories = useMemo(() => {
+    return [...category.subcategories].sort((a, b) => {
+      const aHasImage = !!a.imageUrl;
+      const bHasImage = !!b.imageUrl;
+      
+      // If both have images or both don't, keep original order
+      if (aHasImage === bHasImage) return 0;
+      
+      // Put items WITH images first
+      return aHasImage ? -1 : 1;
+    });
+  }, [category.subcategories]);
+
   return (
     <section
       ref={sectionRef}
@@ -465,7 +488,7 @@ function CategorySection({
       <motion.div layout transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}>
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {/* Always-visible first 4 */}
-          {category.subcategories.slice(0, INITIAL_VISIBLE).map((sub, subIdx) => (
+          {sortedSubcategories.slice(0, INITIAL_VISIBLE).map((sub, subIdx) => (
             <SubcategoryCard
               key={sub.id}
               subcategory={sub}
@@ -476,7 +499,7 @@ function CategorySection({
 
           {/* Extra cards — animate in/out */}
           <AnimatePresence initial={false}>
-            {expanded && category.subcategories.slice(INITIAL_VISIBLE).map((sub, subIdx) => (
+            {expanded && sortedSubcategories.slice(INITIAL_VISIBLE).map((sub, subIdx) => (
               <motion.div
                 key={sub.id}
                 initial={{ opacity: 0, scale: 0.97, y: 12 }}
@@ -510,20 +533,14 @@ function SubcategoryCard({
   onClick: () => void;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30px" }}
-      transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.3) }}
-      className="h-full"
-    >
+    <div className="h-full">
       <motion.button
         onClick={onClick}
         whileHover="hover"
         className="group w-full h-full text-left rounded-2xl overflow-hidden border border-[#E8E2D9] bg-white cursor-pointer shadow-sm hover:shadow-lg hover:border-[#C88F9A]/40 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C88F9A]"
       >
         {/* ── Image frame ── */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F0EBE5] rounded-t-2xl">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl">
           {subcategory.imageUrl ? (
             <motion.div
               variants={{ hover: { scale: 1.06 } }}
@@ -536,13 +553,16 @@ function SubcategoryCard({
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover"
+                fallbackElement={
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#FBF4F5] via-[#F7EFE9] to-[#FCE8E6] flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-white/40 backdrop-blur-sm" />
+                  </div>
+                }
               />
             </motion.div>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#F7EFE9] to-[#EDE1D8]">
-              <span className="font-serif text-3xl font-light text-[#C88F9A]/40 select-none">
-                {subcategory.title.slice(0, 2).toUpperCase()}
-              </span>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FBF4F5] via-[#F7EFE9] to-[#FCE8E6] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-white/40 backdrop-blur-sm" />
             </div>
           )}
 
@@ -577,7 +597,7 @@ function SubcategoryCard({
           </span>
         </div>
       </motion.button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -658,10 +678,29 @@ function SheetContent({
   ].filter(Boolean) as string[];
 
   const [imgIdx, setImgIdx] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     setImgIdx(0);
   }, [subcategory.id]);
+
+  // Keyboard navigation for fullscreen
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsFullscreen(false);
+      } else if (e.key === "ArrowLeft") {
+        setImgIdx((i) => (i - 1 + allImages.length) % allImages.length);
+      } else if (e.key === "ArrowRight") {
+        setImgIdx((i) => (i + 1) % allImages.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullscreen, allImages.length]);
 
   return (
     <div className="flex flex-col h-full">
@@ -677,44 +716,82 @@ function SheetContent({
               sizes="(max-width: 640px) 100vw, 512px"
               className="object-cover opacity-90"
               priority
+              fallbackElement={
+                <div className="absolute inset-0 bg-gradient-to-br from-[#C88F9A]/30 to-[#1A1817]" />
+              }
             />
             {/* Dark gradient for text legibility */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
 
-            {/* Carousel arrows */}
+            {/* Carousel arrows - only show if more than 1 image */}
             {allImages.length > 1 && (
               <>
                 <button
                   onClick={() => setImgIdx((i) => (i - 1 + allImages.length) % allImages.length)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-colors"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-all shadow-lg z-20"
                   aria-label="Previous image"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setImgIdx((i) => (i + 1) % allImages.length)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-all shadow-lg z-20"
                   aria-label="Next image"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
-                {/* Dot indicators */}
-                <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {allImages.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setImgIdx(i)}
-                      className={`rounded-full transition-all cursor-pointer ${i === imgIdx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"
+                
+                {/* Image counter */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+                  <span className="text-xs font-mono text-white bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full">
+                    {imgIdx + 1} / {allImages.length}
+                  </span>
+                </div>
+
+                {/* Expand/Fullscreen button */}
+                <button
+                  onClick={() => setIsFullscreen(true)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-all shadow-lg z-20"
+                  aria-label="View fullscreen"
+                >
+                  <Expand className="w-4 h-4" />
+                </button>
+
+                {/* Thumbnail strip - horizontal scrollable */}
+                <div className="absolute bottom-20 left-0 right-0 px-4 z-20">
+                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    {allImages.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setImgIdx(i)}
+                        className={`relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                          i === imgIdx 
+                            ? "border-white shadow-lg scale-110" 
+                            : "border-white/40 hover:border-white/70 opacity-70 hover:opacity-100"
                         }`}
-                      aria-label={`Image ${i + 1}`}
-                    />
-                  ))}
+                        aria-label={`View image ${i + 1}`}
+                      >
+                        <SafeImage
+                          src={img}
+                          alt={`${subcategory.title} ${i + 1}`}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                          fallbackElement={
+                            <div className="w-full h-full bg-gradient-to-br from-[#C88F9A]/30 to-[#1A1817]" />
+                          }
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </>
             )}
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#C88F9A]/30 to-[#1A1817]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FBF4F5] via-[#F7EFE9] to-[#FCE8E6] flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-white/40 backdrop-blur-sm" />
+          </div>
         )}
 
         {/* Close button — top right */}
@@ -727,7 +804,7 @@ function SheetContent({
         </button>
 
         {/* Title overlay — bottom of image */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-8">
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pt-24 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-10">
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/60 mb-1">
             {categoryName}
           </p>
@@ -779,6 +856,128 @@ function SheetContent({
           <span>Book a Consultation</span>
         </button>
       </div>
+
+      {/* ── Fullscreen Image Viewer ── */}
+      <AnimatePresence>
+        {isFullscreen && allImages.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center"
+            onClick={() => setIsFullscreen(false)}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-all z-20"
+              aria-label="Close fullscreen"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Minimize icon - top left */}
+            <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-sm z-20">
+              <Minimize className="w-5 h-5" />
+            </div>
+
+            {/* Image counter */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+              <span className="text-sm font-mono text-white bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                {imgIdx + 1} / {allImages.length}
+              </span>
+            </div>
+
+            {/* Main image - click won't close */}
+            <div 
+              className="relative w-full h-full flex items-center justify-center p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-full h-full max-w-5xl max-h-[90vh]">
+                <SafeImage
+                  src={allImages[imgIdx]}
+                  alt={`${subcategory.title} - Image ${imgIdx + 1}`}
+                  fill
+                  sizes="(max-width: 1536px) 100vw, 1536px"
+                  className="object-contain"
+                  priority
+                  fallbackElement={
+                    <div className="w-full h-full bg-gradient-to-br from-[#C88F9A]/30 to-[#1A1817] flex items-center justify-center">
+                      <span className="text-white/60 text-lg">Failed to load image</span>
+                    </div>
+                  }
+                />
+              </div>
+            </div>
+
+            {/* Navigation arrows */}
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setImgIdx((i) => (i - 1 + allImages.length) % allImages.length);
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-all shadow-xl z-20"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setImgIdx((i) => (i + 1) % allImages.length);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer backdrop-blur-sm transition-all shadow-xl z-20"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            {/* Thumbnail strip at bottom */}
+            <div className="absolute bottom-8 left-0 right-0 px-4 z-20">
+              <div className="flex justify-center gap-2 overflow-x-auto pb-2 scrollbar-hide max-w-4xl mx-auto">
+                {allImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setImgIdx(i);
+                    }}
+                    className={`relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      i === imgIdx 
+                        ? "border-white shadow-xl scale-110" 
+                        : "border-white/30 hover:border-white/60 opacity-60 hover:opacity-100"
+                    }`}
+                    aria-label={`View image ${i + 1}`}
+                  >
+                    <SafeImage
+                      src={img}
+                      alt={`${subcategory.title} thumbnail ${i + 1}`}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                      fallbackElement={
+                        <div className="w-full h-full bg-gradient-to-br from-[#C88F9A]/30 to-[#1A1817]" />
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ESC to close hint */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+              <span className="text-xs text-white/40 font-mono">
+                Press ESC or click outside to close
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

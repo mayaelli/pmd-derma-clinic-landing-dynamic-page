@@ -48,14 +48,11 @@ export function SafeImage({
     return <>{fallbackElement}</>;
   }
 
-  // If there was an error and no fallback provided, show default gradient
+  // If there was an error and no fallback provided, show beautiful pastel gradient
   if (error) {
-    const initials = alt.slice(0, 2).toUpperCase();
     return (
-      <div className={`flex items-center justify-center bg-gradient-to-br from-[#F7EFE9] to-[#EDE1D8] ${className || ''}`}>
-        <span className="font-serif text-3xl font-light text-[#C88F9A]/40 select-none">
-          {initials}
-        </span>
+      <div className={`flex items-center justify-center bg-gradient-to-br from-[#FBF4F5] via-[#F7EFE9] to-[#FCE8E6] ${className || ''}`}>
+        <div className="w-16 h-16 rounded-full bg-white/40 backdrop-blur-sm" />
       </div>
     );
   }
